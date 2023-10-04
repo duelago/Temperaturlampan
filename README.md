@@ -13,9 +13,9 @@ Själva stången som stjärnana sitter på är ett vanligt metallsugrör som fin
 De komponenter som behövs är:
 
 - 3D-printad låda och lock
-- Wemos D1 mini v3
-- Wemos D1 mini OLED shield
-- WS2811 LED
+- Wemos D1 mini v3 (varianten med skruvhål)  https://www.aliexpress.com/item/4000420770002.html
+- Wemos D1 mini OLED shield https://www.aliexpress.com/item/32872809298.html
+- WS2811 LED https://pchbutik.se/en/komponenter/1842-5-st-5-mm-led-med-inbyggt-ws2811-chip-rgb-pixel-roed-groen-bla.html
 - 100 ohm motstånd
 - Metallsugrör
 - Dupontsladdar
@@ -39,6 +39,11 @@ De komponenter som behövs är:
 <h1>Julversion</h1>
 
 ![temperaturlampan-stjarna](https://github.com/duelago/Temperaturlampan/assets/12539239/859001ad-1024-4838-bd3d-e470d4a57013)
+
+
+Denna versionen av Wemos D1 mini passar 
+
+![Screenshot 2023-10-04 at 19 12 29](https://github.com/duelago/Temperaturlampan/assets/12539239/45842c62-73e3-4499-badd-159bfa92e052)
 
 
 <h1>Instruktioner</h1>

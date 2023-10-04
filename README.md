@@ -20,6 +20,7 @@ De komponenter som behövs är:
 - Metallsugrör
 - Dupontsladdar
 - Smältlim för att få LEDen på plats i stjärnan
+- Superlim (om du gör varianten med stjärnan)
 - Microusb-kabel
 - Krympslang, framförallt för lödningarna uppe vid LEDen
 

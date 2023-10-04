@@ -1,6 +1,11 @@
 # Temperaturlampan
 En 3D-printad lampa som ändrar färg beroende på yttertemperatur
 
+Lampan fungerar fristående, men vill du ha en lampa som du integrerar i ett befintligt hemautomatiseringsprojekt så kan du flasha WLED på hårdvaran istället för att köra min kod. 
+Kolla här: https://kno.wled.ge/
+
+För min kod flashar du filen metar.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
+
 Temperaturlampan består av en adresserbar WS2811 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
 Temperaturen visas även med siffror på OLED-skärmen.

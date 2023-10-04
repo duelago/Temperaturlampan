@@ -23,19 +23,24 @@ De komponenter som behövs är:
 - Microusb-kabel
 - Krympslang, framförallt för lödningarna uppe vid LEDen
 
+<h1>Kopplingsschema</h1>
+
+![skiss](https://github.com/duelago/Temperaturlampan/assets/12539239/7f917df6-da84-4c0b-8d06-351bf7535b82)
+
+
+
+
 <h1>3D-printad lampa</h1>
-![skiss](https://github.com/duelago/Temperaturlampan/assets/12539239/adb47f02-b3e3-48fd-9842-8540c615630b)
 
-
-
-![temperaturlampan-tulip](https://github.com/duelago/Temperaturlampan/assets/12539239/87550a2e-41df-498f-b439-62fd7137fa43)
+![temperaturlampan-tulip](https://github.com/duelago/Temperaturlampan/assets/12539239/1e27401d-4797-4640-9fd7-3ef83dfc9c0f)
 
 
 <h1>Julversion</h1>
-![temperaturlampan-stjarna](https://github.com/duelago/Temperaturlampan/assets/12539239/3af25f29-aa95-4592-a9a4-02e15cef8af8)
+
+![temperaturlampan-stjarna](https://github.com/duelago/Temperaturlampan/assets/12539239/859001ad-1024-4838-bd3d-e470d4a57013)
 
 
-Instruktioner:
+<h1>Instruktioner</h1>h1>
 
 Användaren ansluter enheten med en vanlig microusb-kabel och mobilladdare. Första gången man ansluter lampan i hemmet dyker en ny accesspunkt upp som heter <b>Temperaturlampan</b> Anslut till denna via en captive portal som poppar upp, eller via IP-adress: http://192.168.4.1
 

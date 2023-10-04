@@ -23,6 +23,7 @@ De komponenter som behövs är:
 - Microusb-kabel
 - Krympslang, framförallt för lödningarna uppe vid LEDen
 
+<h1>3D-printad lampa</h1>
 ![skiss](https://github.com/duelago/Temperaturlampan/assets/12539239/adb47f02-b3e3-48fd-9842-8540c615630b)
 
 
@@ -30,7 +31,7 @@ De komponenter som behövs är:
 ![temperaturlampan-tulip](https://github.com/duelago/Temperaturlampan/assets/12539239/87550a2e-41df-498f-b439-62fd7137fa43)
 
 
-Julversion:
+<h1>Julversion</h1>
 ![temperaturlampan-stjarna](https://github.com/duelago/Temperaturlampan/assets/12539239/3af25f29-aa95-4592-a9a4-02e15cef8af8)
 
 

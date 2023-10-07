@@ -117,6 +117,13 @@ html += "ESTA &Auml;ngelholm/Bark&aring;kra (F10)<br>";
 html += "ESOE &Ouml;rebro<br>";
 html += "ESNO &Ouml;rnsk&ouml;ldsvik/Gide&aring;<br>";
 html += "ESNZ &Ouml;stersund/Fr&ouml;s&ouml;n (F4)";
+
+// Display the latest METAR data
+  html += "<h2>Senaste METAR:</h2>";
+  html += "<p>";
+  html += METAR;
+  html += "</p>";
+  
 html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
 html += "Version 0.9 Temperaturlampan<br>";
 html += "</body></html>";
@@ -232,7 +239,7 @@ void loop() {
 
   // Fetch METAR data every 30 minutes
   static unsigned long lastFetchTime = 0;
-  const unsigned long fetchInterval = 1800000;  // 30 minutes in milliseconds
+  const unsigned long fetchInterval = 900000;  // 15 minutes in milliseconds
   unsigned long currentTime = millis();
 
   if (currentTime - lastFetchTime >= fetchInterval) {

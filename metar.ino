@@ -72,12 +72,23 @@ void setLEDColor(float tempLed) {
     strip.show();
 }
 
+
 void handleRoot() {
-  String html = "<html><body><h1>METAR-kod:</h1>";
-  html += "<form method='post' action='/submit'>";
+  String html = "<html><head><style>";
+  html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
+  html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
+  html += ".input-group { margin-bottom: 20px; }";
+  html += ".input-group input[type='text'] { width: 80%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }";
+  html += ".input-group input[type='submit'] { width: 18%; padding: 8px; font-size: 16px; border: none; background-color: #4caf50; color: #ffffff; cursor: pointer; border-radius: 5px; }";
+  html += ".metar-info { font-size: 18px; margin-top: 20px; }";
+  html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
+  html += "</style></head><body>";
+  html += "<div class='container'><h1>METAR-kod:</h1>";
+  html += "<div class='input-group'><form method='post' action='/submit'>";
   html += "<input type='text' name='stationCode' placeholder='ESSB' />";
-  html += "<input type='submit' value='Skicka' />";
-  html += "</form>";
+
+html += "<input type='submit' value='Skicka' />";
+html += "</form>";
 html += "<p>ESGG G&ouml;TEBORG/Landvetter<br>";
 html += "ESOK KARLSTAD<br>";
 html += "ESNQ KIRUNA<br>";
@@ -117,15 +128,12 @@ html += "ESTA &Auml;ngelholm/Bark&aring;kra (F10)<br>";
 html += "ESOE &Ouml;rebro<br>";
 html += "ESNO &Ouml;rnsk&ouml;ldsvik/Gide&aring;<br>";
 html += "ESNZ &Ouml;stersund/Fr&ouml;s&ouml;n (F4)";
-
-// Display the latest METAR data
-  html += "<h2>Senaste METAR:</h2>";
-  html += "<p>";
-  html += METAR;
-  html += "</p>";
-  
+html += "</div>";
+html += "<div class='metar-info'>Senaste METAR:<br>";
+html += METAR;
 html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
 html += "Version 0.9 Temperaturlampan<br>";
+html += "</div>";
 html += "</body></html>";
 
   server.send(200, "text/html", html);

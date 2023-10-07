@@ -10,6 +10,8 @@
 #include <Adafruit_SSD1306.h>
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
+#include <ElegantOTA.h>
+
 
 
 #define OLED_RESET 0
@@ -115,7 +117,10 @@ html += "ESTA &Auml;ngelholm/Bark&aring;kra (F10)<br>";
 html += "ESOE &Ouml;rebro<br>";
 html += "ESNO &Ouml;rnsk&ouml;ldsvik/Gide&aring;<br>";
 html += "ESNZ &Ouml;stersund/Fr&ouml;s&ouml;n (F4)";
+html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
+html += "Version 0.9 Temperaturlampan<br>";
 html += "</body></html>";
+
   server.send(200, "text/html", html);
 }
 
@@ -147,6 +152,7 @@ void setup() {
   display.clearDisplay();
   Serial.begin(115200);
   MDNS.begin("temperaturlampan");
+  ElegantOTA.begin(&server);
 
   // Initialize NeoPixel strip
   strip.begin();

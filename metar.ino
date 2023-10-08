@@ -20,7 +20,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 #define PIN            D4  // Define the pin for WS2811 LEDs
 #define NUM_LEDS       1   // Define the number of LEDs
-#define LED_BRIGHTNESS 250  // Define LED brightness (0-255)
+#define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);

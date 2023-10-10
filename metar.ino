@@ -61,7 +61,7 @@ void setLEDColor(float tempLed) {
     } else if (tempLed >= -50 && tempLed < -5) {
         color = strip.Color(0, 255, 255);
     } else if (tempLed >= 6 && tempLed <= 10) {
-        color = strip.Color(255, 255, 0);
+        color = strip.Color(255, 153, 0);
     } else if (tempLed >= 11 && tempLed <= 45) {
         color = strip.Color(0, 255, 0);
     }

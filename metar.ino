@@ -14,6 +14,7 @@
 
 
 
+
 #define OLED_RESET 0
 
 Adafruit_SSD1306 display(OLED_RESET);
@@ -28,6 +29,10 @@ ESP8266WebServer server(80);
 
 char METARStation[EEPROM_SIZE];
 String METAR; // Declare METAR as a global variable
+
+const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+unsigned long previousMillis = 0;
+
 
 String parseTemperature(const String& metar) {
   // Find the position of "Temperature: " in the METAR string
@@ -242,6 +247,17 @@ void fetchMETARData() {
 }
 
 void loop() {
+  
+{
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= REBOOT_INTERVAL) {
+    // It's time to reboot
+    Serial.println("Rebooting ESP8266...");
+    delay(100); // Print the message before rebooting
+    ESP.restart(); // Reboot the ESP8266
+ }
+    
    MDNS.update();
   server.handleClient();
 
@@ -256,5 +272,7 @@ void loop() {
   }
 
   // Delay for a short time to prevent excessive loop iterations
+   previousMillis = currentMillis;
   delay(100);
-}
+  
+}}

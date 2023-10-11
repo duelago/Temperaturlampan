@@ -6,7 +6,7 @@ Kolla här: https://kno.wled.ge/
 
 För min kod flashar du filen metar.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
 
-Temperaturlampan består av en adresserbar WS2811 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
+Temperaturlampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
 Temperaturen visas även med siffror på OLED-skärmen.
 
@@ -20,7 +20,7 @@ De komponenter som behövs är:
 - 3D-printad låda och lock
 - Wemos D1 mini v3 (varianten med skruvhål)  https://www.aliexpress.com/item/4000420770002.html
 - Wemos D1 mini OLED shield https://www.aliexpress.com/item/32872809298.html
-- WS2811 LED https://pchbutik.se/en/komponenter/1842-5-st-5-mm-led-med-inbyggt-ws2811-chip-rgb-pixel-roed-groen-bla.html
+- WS2812 LED https://www.electrokit.com/produkt/led-rgb-5mm-adresserbar-ws2812-diffus-5-pack/
 - 100 ohm motstånd
 - Metallsugrör
 - Dupontsladdar

@@ -58,3 +58,6 @@ Användaren ansluter enheten med en vanlig microusb-kabel och mobilladdare. För
 Lampan får nu en IP-adress av DHCP-servern i hemmet. Användaren ansluter sin dator eller telefon till sitt hemmawifi igen och når nu lampan via denna nya IP-adress eller på adressen: http://temperaturlampan.local
 
 I webbinterfacet ställer man in flygplats. Denna sparas i EEPROM och klarar alltså strömavbrott etc. 
+
+![ezgif com-crop](https://github.com/duelago/Temperaturlampan/assets/12539239/41c63c9f-87a0-4780-b7ca-e82fb4401fc8)
+

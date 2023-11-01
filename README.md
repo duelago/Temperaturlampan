@@ -13,7 +13,7 @@ Temperaturen visas även med siffror på OLED-skärmen.
 
 Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode
 
-Själva stången som stjärnana sitter på är ett vanligt metallsugrör som finns på typ ICA. Lådan och stjärnan är 3D-printad och STL-filer finns bifogade.
+Själva stången som stjärnan sitter på är ett vanligt metallsugrör som finns på ICA eller amazon.se. Lådan och stjärnan är 3D-printad och STL-filer finns bifogade.
 
 De komponenter som behövs är:
 

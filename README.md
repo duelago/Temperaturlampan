@@ -63,6 +63,4 @@ I webbinterfacet ställer man in flygplats. Denna sparas i EEPROM och klarar all
 
 ![ezgif com-crop](https://github.com/duelago/Temperaturlampan/assets/12539239/41c63c9f-87a0-4780-b7ca-e82fb4401fc8)
 
-Beställde en tredje typ av LED som har denna pinouten
 
-![Screenshot 2023-11-28 at 10 53 52](https://github.com/duelago/Temperaturlampan/assets/12539239/9fed205d-eeeb-43c3-9d69-fbd2a2076dd6)

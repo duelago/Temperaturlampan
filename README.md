@@ -20,7 +20,8 @@ De komponenter som behövs är:
 - 3D-printad låda och lock
 - Wemos D1 mini v3 (varianten med skruvhål)  https://www.aliexpress.com/item/4000420770002.html
 - Wemos D1 mini OLED shield https://www.aliexpress.com/item/32872809298.html
-- WS2812 LED https://www.electrokit.com/produkt/led-rgb-5mm-adresserbar-ws2812-diffus-5-pack/
+- WS2812 LED https://www.aliexpress.com/item/1005001863273661.html
+- WS2812 LED (alternativ i Sverige) https://www.electrokit.com/produkt/led-rgb-5mm-adresserbar-ws2812-diffus-5-pack/
 - 100 ohm motstånd
 - Metallsugrör
 - Dupontsladdar

@@ -28,7 +28,7 @@ De komponenter som behövs är:
 - Smältlim för att få LEDen på plats i stjärnan
 - Superlim 
 - Microusb-kabel
-- Krympslang, framförallt för lödningarna uppe vid LEDen
+- Krympslang (för lödningarna vid LEDen)
 
 <h1>Kopplingsschema</h1>
 

@@ -48,7 +48,7 @@ De komponenter som behövs är:
 ![temperaturlampan-stjarna](https://github.com/duelago/Temperaturlampan/assets/12539239/859001ad-1024-4838-bd3d-e470d4a57013)
 
 
-Denna versionen av Wemos D1 mini passar 
+Denna versionen av Wemos D1 mini med skruvhål passar i lådan 
 
 ![Screenshot 2023-10-04 at 19 12 29](https://github.com/duelago/Temperaturlampan/assets/12539239/45842c62-73e3-4499-badd-159bfa92e052)
 

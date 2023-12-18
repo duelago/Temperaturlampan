@@ -30,6 +30,7 @@ De komponenter som behövs är:
 - Superlim 
 - Microusb-kabel
 - Krympslang (för lödningarna vid LEDen)
+- 2 st M 2.5 skruvar (Funkar även utan om du printar den versionen av lådan)
 
 <h1>Kopplingsschema</h1>
 

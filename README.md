@@ -12,10 +12,9 @@ Temperaturen visas även med siffror på OLED-skärmen och "allt" väder present
 
 
 Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode.
-Lådan finns att printa i två olika versioner. Med eller utan fästen för M 2.5 skruvar. Den med skruv är bättre, men har du inga M 2.5 liggandes så funkar versionen utan om du säkrar Wemosen med smältlim. 
+Lådan finns att printa i två olika versioner och STEP/STL-filer finns att ladda ner.  Välj om du vill ha versione med eller utan fästen för M 2.5 skruvar. Den med skruv är bättre, men har du inga M 2.5 liggandes så funkar versionen utan skruv om du säkrar Wemosen med smältlim. 
 
-Själva stången som stjärnan sitter på är ett vanligt metallsugrör som finns på ICA eller amazon.se. Lådan och stjärnan är 3D-printad och STL-filer finns bifogade.
-
+Själva stången som stjärnan sitter på är ett vanligt metallsugrör som finns på ICA eller amazon.se. 
 De komponenter som behövs är:
 
 - 3D-printad låda och lock

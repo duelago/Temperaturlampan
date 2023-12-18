@@ -11,7 +11,8 @@ Temperaturlampan består av en adresserbar WS2812 LED som ändrar färg beroende
 Temperaturen visas även med siffror på OLED-skärmen.
 
 
-Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode
+Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode.
+Lådan finns att printa i två olika versioner. Med eller utan fästen för M 2.5 skruvar. Den med skruv är bättre, men har du inga M 2.5 liggandes så funkar versionen utan om du säkrar Wemosen med smältlim. 
 
 Själva stången som stjärnan sitter på är ett vanligt metallsugrör som finns på ICA eller amazon.se. Lådan och stjärnan är 3D-printad och STL-filer finns bifogade.
 

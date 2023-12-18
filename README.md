@@ -8,7 +8,7 @@ För min kod flashar du filen metar.ino  i Arduino IDE eller så laddar du ner .
 
 Temperaturlampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
-Temperaturen visas även med siffror på OLED-skärmen.
+Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet (på engelska)
 
 
 Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode.

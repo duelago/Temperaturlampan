@@ -303,9 +303,8 @@ void setLEDColor(float tempLed) {
     }
     strip.show();
 }
-
 void handleRoot() {
-    String html = "<html><head><style>";
+    String html = "<html><head><meta charset='utf-8'><style>";
     html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
     html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
     html += ".input-group { margin-bottom: 20px; }";
@@ -319,53 +318,53 @@ void handleRoot() {
     html += "<input type='text' name='stationCode' placeholder='ESSB' />";
 
     // Add input field for song title
-    html += "<input type='text' name='songTitle' placeholder='Song Title' />";
+    html += "<input type='text' name='songTitle' placeholder='Sångtitel' />";
 
     html += "<input type='submit' value='Skicka' />";
     html += "</form>";
-    html += "<p>ESGG GöTEBORG/Landvetter<br>";
+    html += "<p>ESGG GÖTEBORG/Landvetter<br>";
     html += "ESOK KARLSTAD<br>";
     html += "ESNQ KIRUNA<br>";
     html += "ESMS MALMÖ<br>";
     html += "ESSA STOCKHOLM/Arlanda<br>";
     html += "ESSB STOCKHOLM/Bromma<br>";
     html += "ESKN STOCKHOLM/Skavsta<br>";
-    html += "ESOW STOCKHOLM/VäSTERåS<br>";
+    html += "ESOW STOCKHOLM/Västerås<br>";
     html += "<p>";
     html += "ESNX Arvidsjaur<br>";
     html += "ESSD Borlänge<br>";
-    html += "ESNG GäLLIVARE<br>";
+    html += "ESNG Gällivare<br>";
     html += "ESMT Halmstad (F14)<br>";
     html += "ESUT Hemavan<br>";
-    html += "ESGJ JöNKöPING<br>";
+    html += "ESGJ Jönköping<br>";
     html += "ESMQ Kalmar (F12)<br>";
     html += "ESNK Kramfors/Sollefteå<br>";
-    html += "ESMK Kristianstad/EveröD<br>";
-    html += "ESCF LinköPING/Malmen (F3)<br>";
+    html += "ESMK Kristianstad/Everöd<br>";
+    html += "ESCF Linköping/Malmen (F3)<br>";
     html += "ESTL Ljungbyhed (F5)<br>";
     html += "ESPA Luleå (F21)<br>";
     html += "ESNL Lycksele<br>";
-    html += "ESSP NorrköPING/KungsäNGEN<br>";
+    html += "ESSP Norrköping/Kungsängen<br>";
     html += "ESUP Pajala<br>";
     html += "ESDF Ronneby (F17)<br>";
     html += "ESNS Skellefteå<br>";
-    html += "ESGR SköVde<br>";
+    html += "ESGR Skövde<br>";
     html += "ESNN Sundsvall-Timrå<br>";
-    html += "ESIB SäTENäS (F7)<br>";
-    html += "ESKS SäLEN<br>";
-    html += "ESGT Trollhättan-VäNersborg<br>";
-    html += "ESNU UMEå<br>";
+    html += "ESIB Såtenäs (F7)<br>";
+    html += "ESKS Sälen<br>";
+    html += "ESGT Trollhättan-Vänersborg<br>";
+    html += "ESNU Umeå<br>";
     html += "ESNV Vilhelmina<br>";
     html += "ESSV Visby<br>";
-    html += "ESMX VäXJö/Kronoberg<br>";
-    html += "ESTA ängelholm/BarkåKra (F10)<br>";
-    html += "ESOE öRebro<br>";
-    html += "ESNO öRnsköLdsvik/Gideå<br>";
-    html += "ESNZ öStersund/FröSöN";
+    html += "ESMX Växjö/Kronoberg<br>";
+    html += "ESTA Ängelholm/Barkåkra (F10)<br>";
+    html += "ESOE ÖRebro<br>";
+    html += "ESNO Örnsköldsvik/Gideå<br>";
+    html += "ESNZ ÖStersund/Frösön";
     html += "</div>";
     html += "<div class='metar-info'>Senaste METAR:<br>";
     html += METAR;
-    html += "<p>Song Title: ";
+    html += "<p>Sångtitel: ";
     html += songTitle;
     html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
     html += "Version 0.9 Temperaturlampan<br>";

@@ -27,6 +27,7 @@ ESP8266WebServer server(80);
 
 char METARStation[EEPROM_SIZE];
 String METAR; // Declare METAR as a global variable
+String songTitle; // Declare songTitle as a global variable
 
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
@@ -36,8 +37,9 @@ const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme"
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
+    songTitle = trackTitle;
     Serial.print("Track Title: ");
-    Serial.println(trackTitle);
+    Serial.println(songTitle);
 }
 
 String parseTemperature(const String& metar) {
@@ -83,16 +85,137 @@ void setLEDColor(float tempLed) {
     strip.show();
 }
 
+
 void handleRoot() {
-    // Your existing handleRoot function
+    String html = "<html><head><style>";
+    html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
+    html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
+    html += ".input-group { margin-bottom: 20px; }";
+    html += ".input-group input[type='text'] { width: 80%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }";
+    html += ".input-group input[type='submit'] { width: 18%; padding: 8px; font-size: 16px; border: none; background-color: #4caf50; color: #ffffff; cursor: pointer; border-radius: 5px; }";
+    html += ".metar-info { font-size: 18px; margin-top: 20px; }";
+    html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
+    html += "</style></head><body>";
+    html += "<div class='container'><h1>METAR-kod:</h1>";
+    html += "<div class='input-group'><form method='post' action='/submit'>";
+    html += "<input type='text' name='stationCode' placeholder='ESSB' />";
+
+    html += "<input type='submit' value='Skicka' />";
+    html += "</form>";
+    html += "<p>ESGG G&ouml;TEBORG/Landvetter<br>";
+    html += "ESOK KARLSTAD<br>";
+    html += "ESNQ KIRUNA<br>";
+    html += "ESMS MALM&ouml;<br>";
+    html += "ESSA STOCKHOLM/Arlanda<br>";
+    html += "ESSB STOCKHOLM/Bromma<br>";
+    html += "ESKN STOCKHOLM/Skavsta<br>";
+    html += "ESOW STOCKHOLM/V&auml;ster&aring;s<br>";
+    html += "<p>";
+    html += "ESNX Arvidsjaur<br>";
+    html += "ESSD Borl&auml;nge<br>";
+    html += "ESNG G&auml;llivare<br>";
+    html += "ESMT Halmstad (F14)<br>";
+    html += "ESUT Hemavan<br>";
+    html += "ESGJ J&ouml;nk&ouml;ping<br>";
+    html += "ESMQ Kalmar (F12)<br>";
+    html += "ESNK Kramfors/Sollefte&aring;<br>";
+    html += "ESMK Kristianstad/Ever&ouml;d<br>";
+    html += "ESCF Link&ouml;ping/Malmen (F3)<br>";
+    html += "ESTL Ljungbyhed (F5)<br>";
+    html += "ESPA Lule&aring; (F21)<br>";
+    html += "ESNL Lycksele<br>";
+    html += "ESSP Norrk&ouml;ping/Kungs&auml;ngen<br>";
+    html += "ESUP Pajala<br>";
+    html += "ESDF Ronneby (F17)<br>";
+    html += "ESNS Skellefte&aring;<br>";
+    html += "ESGR Sk&ouml;vde<br>";
+    html += "ESNN Sundsvall-Timr&aring;<br>";
+    html += "ESIB S&aring;ten&auml;s (F7)<br>";
+    html += "ESKS S&auml;len<br>";
+    html += "ESGT Trollh&auml;ttan-V&auml;nersborg<br>";
+    html += "ESNU Ume&aring;<br>";
+    html += "ESNV Vilhelmina<br>";
+    html += "ESSV Visby<br>";
+    html += "ESMX V&auml;xj&ouml;/Kronoberg<br>";
+    html += "ESTA &Auml;ngelholm/Bark&aring;kra (F10)<br>";
+    html += "ESOE &Ouml;rebro<br>";
+    html += "ESNO &Ouml;rnsk&ouml;ldsvik/Gide&aring;<br>";
+    html += "ESNZ &Ouml;stersund/Fr&ouml;s&ouml;n (F4)";
+    html += "</div>";
+    html += "<div class='metar-info'>Senaste METAR:<br>";
+    html += METAR;
+    html += "<p>Song Title: ";
+    html += songTitle;
+    html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
+    html += "Version 0.9 Temperaturlampan<br>";
+    html += "</div>";
+    html += "</body></html>";
+
+    server.send(200, "text/html", html);
 }
 
 void handleSubmit() {
-    // Your existing handleSubmit function
+    String stationCode = server.arg("stationCode");
+
+    // Convert the input station code to uppercase
+    stationCode.toUpperCase();
+
+    // Copy the uppercase station code to METARStation variable
+    stationCode.toCharArray(METARStation, EEPROM_SIZE);
+
+    // Update EEPROM with the new METAR station code
+    EEPROM.begin(EEPROM_SIZE);
+    for (int i = 0; i < EEPROM_SIZE; ++i) {
+        EEPROM.write(i, METARStation[i]);
+    }
+    EEPROM.end();
+
+    server.send(200, "text/html", "Stationen uppdaterad. <a href='/'>Tillbaka</a>");
 }
 
 void fetchMETARData() {
-    // Your existing fetchMETARData function
+    // Fetch METAR data using METARStation variable (e.g., "ESSA" or user-defined value)
+    WiFiClientSecure client;
+    client.setInsecure(); // Ignore SSL certificate verification
+
+    HTTPClient https;
+    String url = "https://tgftp.nws.noaa.gov/data/observations/metar/decoded/" + String(METARStation) + ".TXT";
+    https.begin(client, url); // Use ::begin(WiFiClient, url) syntax
+
+    int httpCode = https.GET();
+
+    if (httpCode == HTTP_CODE_OK) {
+        METAR = https.getString();
+        https.end();
+
+        // For testing purposes, print METAR data
+        Serial.println("Fetching METAR data...");
+        Serial.println(METAR);
+
+        // Parse the temperature from the METAR string
+        String temperature = parseTemperature(METAR);
+        float tempLed = temperature.toFloat();
+
+        // Print the temperature to the serial port
+        Serial.print("The temperature is ");
+        Serial.print(tempLed);
+        Serial.println(" degrees Celsius.");
+
+        display.cp437(true);
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setTextColor(WHITE);
+        display.setCursor(25, 15);
+        display.print(int(tempLed));
+
+        display.display();
+
+        // Set LED color based on temperature
+        setLEDColor(tempLed);
+    } else {
+        Serial.println("Failed to fetch METAR data");
+        https.end();
+    }
 }
 
 void setup() {
@@ -157,7 +280,7 @@ void loop() {
 
     if (currentMillis - lastCheckTime >= checkInterval) {
         lastCheckTime = currentMillis;
-        
+
         if (WiFi.status() == WL_CONNECTED) {
             WiFiClientSecure client;
             client.setInsecure(); // Ignore SSL certificate verification

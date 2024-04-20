@@ -34,12 +34,24 @@ unsigned long previousMillis = 0;
 
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
 
+bool blinkLED = false; // Flag to control LED blinking
+
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
     songTitle = trackTitle;
     Serial.print("Track Title: ");
     Serial.println(songTitle);
+    
+    // If the song title is "Last Christmas", start blinking the LED
+    if (songTitle == "Last Christmas") {
+        blinkLED = true;
+    } else {
+        blinkLED = false;
+        // Turn off the LED if the song title is not "Last Christmas"
+        strip.setPixelColor(0, strip.Color(0, 0, 0));
+        strip.show();
+    }
 }
 
 String parseTemperature(const String& metar) {
@@ -84,7 +96,6 @@ void setLEDColor(float tempLed) {
     }
     strip.show();
 }
-
 
 void handleRoot() {
     String html = "<html><head><style>";
@@ -329,6 +340,17 @@ void loop() {
             wifiManager.autoConnect("Temperaturlampan");
             delay(5000);
         }
+    }
+
+    // Blink LED if the flag is true
+    if (blinkLED) {
+        // Blink LED
+        strip.setPixelColor(0, strip.Color(255, 255, 255));
+        strip.show();
+        delay(500);
+        strip.setPixelColor(0, strip.Color(0, 0, 0));
+        strip.show();
+        delay(500);
     }
 
     delay(100); // Delay for a short time to prevent excessive loop iterations

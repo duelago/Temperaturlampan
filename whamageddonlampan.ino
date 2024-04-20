@@ -313,12 +313,12 @@ void handleRoot() {
     html += ".metar-info { font-size: 18px; margin-top: 20px; }";
     html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
     html += "</style></head><body>";
-    html += "<div class='container'><h1>METAR-kod:</h1>";
+    html += "<div class='container'><h1>Whamageddonlampan - METAR och Låttitel</h1>";
     html += "<div class='input-group'><form method='post' action='/submit'>";
     html += "<input type='text' name='stationCode' placeholder='ESSB' />";
 
     // Add input field for song title
-    html += "<input type='text' name='songTitle' placeholder='Sångtitel' />";
+    html += "<input type='text' name='songTitle' placeholder='Last Christmas' />";
 
     html += "<input type='submit' value='Skicka' />";
     html += "</form>";

@@ -367,7 +367,7 @@ void handleRoot() {
     html += "<p>Sångtitel: ";
     html += songTitle;
     html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
-    html += "Version 0.9 Temperaturlampan<br>";
+    html += "Version 0.1 Whamageddonlampan<br>";
     html += "</div>";
     html += "</body></html>";
 

@@ -50,7 +50,7 @@ void loop() {
           Serial.println(payload); // Print raw JSON data
 
           // Parse JSON from the buffer
-          StaticJsonDocument<512> doc;
+          StaticJsonDocument<1200> doc;
           DeserializationError error = deserializeJson(doc, payload);
 
           if (!error && doc.is<JsonObject>()) {

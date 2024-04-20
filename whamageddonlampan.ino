@@ -20,7 +20,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define PIN            D4  // Define the pin for WS2811 LEDs
 #define NUM_LEDS       1   // Define the number of LEDs
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
-#define EEPROM_SIZE    50   // Size of EEPROM for storing METAR station code and song title
+#define EEPROM_SIZE    100   // Size of EEPROM for storing METAR station code and song title
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 ESP8266WebServer server(80);
@@ -48,7 +48,7 @@ void handleJsonObject(JsonObject obj) {
     char storedSongTitle[EEPROM_SIZE];
     EEPROM.begin(EEPROM_SIZE);
     for (int i = 0; i < EEPROM_SIZE; ++i) {
-        storedSongTitle[i] = EEPROM.read(i);
+        storedSongTitle[i] = EEPROM.read(i + EEPROM_SIZE); // Hämta sparad titel
     }
     EEPROM.end();
     
@@ -56,7 +56,7 @@ void handleJsonObject(JsonObject obj) {
     String storedTitle = String(storedSongTitle);
     
     // If the retrieved song title matches the one from API, set the blinkLED flag
-    if (songTitle == storedTitle) {
+    if (songTitle.equals(storedTitle)) {
         blinkLED = true;
     } else {
         blinkLED = false;
@@ -86,13 +86,14 @@ void handleSubmit() {
     
     // Update EEPROM with the user-defined song title
     for (int i = 0; i < userSongTitle.length(); ++i) {
-        EEPROM.write(EEPROM_SIZE + i, userSongTitle[i]);
+        EEPROM.write(i + EEPROM_SIZE, userSongTitle[i]); // Skriv till EEPROM från rätt plats
     }
     
     EEPROM.end();
 
     server.send(200, "text/html", "Stationen uppdaterad. <a href='/'>Tillbaka</a>");
 }
+
 
 void fetchMETARData() {
     // Fetch METAR data using METARStation variable (e.g., "ESSA" or user-defined value)
@@ -303,7 +304,16 @@ void setLEDColor(float tempLed) {
     }
     strip.show();
 }
+
 void handleRoot() {
+    // Load METAR station code from EEPROM
+    EEPROM.begin(EEPROM_SIZE);
+    char storedSongTitle[EEPROM_SIZE];
+    for (int i = 0; i < EEPROM_SIZE; ++i) {
+        storedSongTitle[i] = EEPROM.read(i + EEPROM_SIZE); // Hämta sparad titel
+    }
+    EEPROM.end();
+    
     String html = "<html><head><meta charset='utf-8'><style>";
     html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
     html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
@@ -366,6 +376,8 @@ void handleRoot() {
     html += METAR;
     html += "<p>Sångtitel: ";
     html += songTitle;
+    html += "<p>Sparad titel: ";
+    html += storedSongTitle;
     html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
     html += "Version 0.1 Whamageddonlampan<br>";
     html += "</div>";
@@ -373,6 +385,7 @@ void handleRoot() {
 
     server.send(200, "text/html", html);
 }
+
 
 // New function to control LED based on the blinkLED flag
 void handleLED() {

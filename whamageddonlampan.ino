@@ -145,7 +145,7 @@ void setup() {
     delay(2000);
     display.clearDisplay();
     Serial.begin(115200);
-    MDNS.begin("temperaturlampan");
+    MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
 
     // Initialize NeoPixel strip
@@ -154,7 +154,7 @@ void setup() {
 
     // Use WiFiManager to set WiFi credentials if they are not already configured
     WiFiManager wifiManager;
-    wifiManager.autoConnect("Temperaturlampan");
+    wifiManager.autoConnect("Whamageddonlampan");
 
     // Load METAR station code from EEPROM
     EEPROM.begin(EEPROM_SIZE);

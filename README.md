@@ -1,15 +1,12 @@
-# Temperaturlampan
-En 3D-printad lampa som ändrar färg beroende på yttertemperatur
+# Whamageddonlampan
+En 3D-printad lampa som ändrar färg beroende på yttertemperatur och börjar blinka om Last Christmas med Wham spelas på Mix Megapol
 
-Lampan fungerar fristående, men vill du ha en lampa som du integrerar i ett befintligt hemautomatiseringsprojekt så kan du flasha WLED på hårdvaran istället för att köra min kod. 
-Kolla här: https://kno.wled.ge/
-
-För min kod flashar du filen metar.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
+Flasha filen whamageddonlampan.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
 
 Temperaturlampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
 Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet (på engelska)
-
+Lampan kollar även spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. Vill du bevaka en annan låttitel kan du ändra detta i lampan webbinterface. 
 
 Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode.
 Lådan finns att printa i två olika versioner och STEP/STL-filer finns att ladda ner.  Välj om du vill ha versionen med eller utan fästen för M 2.5 skruvar. Den med skruv är bättre, men har du inga M 2.5 liggandes så funkar versionen utan skruv om du säkrar Wemosen med smältlim. 

@@ -35,6 +35,7 @@ unsigned long previousMillis = 0;
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
 
 bool blinkLED = false; // Flag to control LED blinking
+uint32_t previousColor = strip.Color(0, 0, 0); // Variable to store the previous LED color
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
@@ -54,13 +55,15 @@ void handleJsonObject(JsonObject obj) {
     // Convert the character array to String
     String storedTitle = String(storedSongTitle);
     
-    // If the retrieved song title matches the one from API, start blinking the LED
+    // If the retrieved song title matches the one from API, set the blinkLED flag
     if (songTitle == storedTitle) {
         blinkLED = true;
     } else {
         blinkLED = false;
-        // Turn off the LED if the song title doesn't match
-        strip.setPixelColor(0, strip.Color(0, 0, 0));
+        // Restore previous LED color
+        for (int i = 0; i < NUM_LEDS; i++) {
+            strip.setPixelColor(i, previousColor);
+        }
         strip.show();
     }
 }
@@ -249,16 +252,8 @@ void loop() {
         }
     }
 
-    // Blink LED if the flag is true
-    if (blinkLED) {
-        // Blink LED
-        strip.setPixelColor(0, strip.Color(255, 255, 255));
-        strip.show();
-        delay(500);
-        strip.setPixelColor(0, strip.Color(0, 0, 0));
-        strip.show();
-        delay(500);
-    }
+    // Call handleLED to control the LED
+    handleLED();
 
     delay(100); // Delay for a short time to prevent excessive loop iterations
 }
@@ -299,6 +294,9 @@ void setLEDColor(float tempLed) {
     } else if (tempLed >= 11 && tempLed <= 45) {
         color = strip.Color(0, 255, 0);
     }
+
+    // Store the current LED color
+    previousColor = color;
 
     for (int i = 0; i < NUM_LEDS; i++) {
         strip.setPixelColor(i, color);
@@ -374,7 +372,33 @@ void handleRoot() {
     html += "</div>";
     html += "</body></html>";
 
-
-
     server.send(200, "text/html", html);
+}
+
+// New function to control LED based on the blinkLED flag
+void handleLED() {
+    if (blinkLED) {
+        unsigned long currentMillis = millis();
+        static unsigned long previousMillis = 0;
+        static bool ledState = false;
+        const unsigned long interval = 500; // Interval in milliseconds
+        
+        if (currentMillis - previousMillis >= interval) {
+            previousMillis = currentMillis;
+            ledState = !ledState; // Toggle LED state
+            
+            if (ledState) {
+                // Turn on the LED
+                for (int i = 0; i < NUM_LEDS; i++) {
+                    strip.setPixelColor(i, previousColor);
+                }
+            } else {
+                // Turn off the LED
+                for (int i = 0; i < NUM_LEDS; i++) {
+                    strip.setPixelColor(i, strip.Color(0, 0, 0));
+                }
+            }
+            strip.show(); // Update LED
+        }
+    }
 }

@@ -1,5 +1,6 @@
 # Whamageddonlampan
-En 3D-printad lampa som ändrar färg beroende på yttertemperatur och börjar blinka om Last Christmas med Wham spelas på Mix Megapol
+
+En 3D-printad lampa som ändrar färg beroende på yttertemperatur OCH börjar blinka om Last Christmas med Wham spelas på Mix Megapol.
 
 Flasha filen whamageddonlampan.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
 

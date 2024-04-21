@@ -87,15 +87,15 @@ void setLEDColor(float tempLed) {
     uint32_t color = 0;
 
     if (tempLed >= 0 && tempLed <= 5) {
-        color = strip.Color(255, 0, 0);
+        color = strip.Color(255, 0, 0); // Röd
     } else if (tempLed >= -5 && tempLed < 0) {
-        color = strip.Color(0, 0, 255);
+        color = strip.Color(0, 255, 0); // Grön
     } else if (tempLed >= -50 && tempLed < -5) {
-        color = strip.Color(0, 255, 255);
+        color = strip.Color(0, 255, 0); // Grön
     } else if (tempLed >= 6 && tempLed <= 10) {
-        color = strip.Color(255, 153, 0);
+        color = strip.Color(255, 153, 0); // Orange
     } else if (tempLed >= 11 && tempLed <= 45) {
-        color = strip.Color(0, 255, 0);
+        color = strip.Color(0, 255, 0); // Grön
     }
 
     for (int i = 0; i < NUM_LEDS; i++) {
@@ -105,7 +105,7 @@ void setLEDColor(float tempLed) {
 }
 
 void handleRoot() {
-    String html = "<html><head><style>";
+    String html = "<html><head><meta charset='UTF-8'><style>";
     html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
     html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
     html += ".input-group { margin-bottom: 20px; }";
@@ -119,52 +119,52 @@ void handleRoot() {
     html += "<input type='text' name='stationCode' placeholder='ESSB' />";
     html += "<input type='submit' value='Skicka' />";
     html += "</form>";
-    html += "<p>ESGG G&ouml;TEBORG/Landvetter<br>";
+    html += "<p>ESGG GöTEBORG/Landvetter<br>";
     html += "ESOK KARLSTAD<br>";
     html += "ESNQ KIRUNA<br>";
-    html += "ESMS MALM&ouml;<br>";
+    html += "ESMS MALMö<br>";
     html += "ESSA STOCKHOLM/Arlanda<br>";
     html += "ESSB STOCKHOLM/Bromma<br>";
     html += "ESKN STOCKHOLM/Skavsta<br>";
-    html += "ESOW STOCKHOLM/V&auml;ster&aring;s<br>";
+    html += "ESOW STOCKHOLM/Västerås<br>";
     html += "<p>";
     html += "ESNX Arvidsjaur<br>";
-    html += "ESSD Borl&auml;nge<br>";
-    html += "ESNG G&auml;llivare<br>";
+    html += "ESSD Borlänge<br>";
+    html += "ESNG Gällivare<br>";
     html += "ESMT Halmstad (F14)<br>";
     html += "ESUT Hemavan<br>";
-    html += "ESGJ J&ouml;nk&ouml;ping<br>";
+    html += "ESGJ Jönköping<br>";
     html += "ESMQ Kalmar (F12)<br>";
-    html += "ESNK Kramfors/Sollefte&aring;<br>";
-    html += "ESMK Kristianstad/Ever&ouml;d<br>";
-    html += "ESCF Link&ouml;ping/Malmen (F3)<br>";
+    html += "ESNK Kramfors/Sollefteå<br>";
+    html += "ESMK Kristianstad/Everöd<br>";
+    html += "ESCF Linköping/Malmen (F3)<br>";
     html += "ESTL Ljungbyhed (F5)<br>";
-    html += "ESPA Lule&aring; (F21)<br>";
+    html += "ESPA Luleå (F21)<br>";
     html += "ESNL Lycksele<br>";
-    html += "ESSP Norrk&ouml;ping/Kungs&auml;ngen<br>";
+    html += "ESSP Norrköping/Kungsängen<br>";
     html += "ESUP Pajala<br>";
     html += "ESDF Ronneby (F17)<br>";
-    html += "ESNS Skellefte&aring;<br>";
-    html += "ESGR Sk&ouml;vde<br>";
-    html += "ESNN Sundsvall-Timr&aring;<br>";
-    html += "ESIB S&aring;ten&auml;s (F7)<br>";
-    html += "ESKS S&auml;len<br>";
-    html += "ESGT Trollh&auml;ttan-V&auml;nersborg<br>";
-    html += "ESNU Ume&aring;<br>";
+    html += "ESNS Skellefteå<br>";
+    html += "ESGR Skövde<br>";
+    html += "ESNN Sundsvall-Timrå<br>";
+    html += "ESIB Såtenäs (F7)<br>";
+    html += "ESKS Sälen<br>";
+    html += "ESGT Trollhättan-Vänersborg<br>";
+    html += "ESNU Umeå<br>";
     html += "ESNV Vilhelmina<br>";
     html += "ESSV Visby<br>";
-    html += "ESMX V&auml;xj&ouml;/Kronoberg<br>";
-    html += "ESTA &Auml;ngelholm/Bark&aring;kra (F10)<br>";
-    html += "ESOE &Ouml;rebro<br>";
-    html += "ESNO &Ouml;rnsk&ouml;ldsvik/Gide&aring;<br>";
-    html += "ESNZ &Ouml;stersund/Fr&ouml;s&ouml;n (F4)";
+    html += "ESMX Växjö/Kronoberg<br>";
+    html += "ESTA Ängelholm/Barkåkra (F10)<br>";
+    html += "ESOE Örebro<br>";
+    html += "ESNO Örnsköldsvik/Gideå<br>";
+    html += "ESNZ Östersund/Frösön (F4)";
     html += "</div>";
     html += "<div class='metar-info'>Senaste METAR:<br>";
     html += METAR;
-    html += "<p>Song Title: ";
+    html += "<p>Låt just nu: ";
     html += songTitle;
     html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
-    html += "Version 0.9 Temperaturlampan<br>";
+    html += "Version 0.5 Whamageddonlampan<br>";
     html += "</div>";
     html += "</body></html>";
 
@@ -269,9 +269,6 @@ void setup() {
     server.on("/", HTTP_GET, handleRoot);
     server.on("/submit", HTTP_POST, handleSubmit);
     server.begin();
-
-unsigned long lastBlinkTime = 0;const unsigned long blinkInterval = 500; // Blink interval in milliseconds
-
 }
 
 void loop() {
@@ -322,10 +319,10 @@ void loop() {
             isBlinking = !isBlinking; // Toggle blinking state
 
             if (isBlinking) {
-                strip.setPixelColor(0, strip.Color(255, 255, 255)); // White color
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
                 strip.show();
             } else {
-                strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
                 strip.show();
             }
         }

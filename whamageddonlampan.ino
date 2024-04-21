@@ -35,6 +35,7 @@ unsigned long previousMillis = 0;
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
 
 bool blinkLED = false; // Flag to control LED blinking
+bool isBlinking = false; // Flag to track if LED is currently blinking
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
@@ -43,19 +44,20 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Mamma", start blinking the LED
-    if (songTitle == "Mamma") {
-        Serial.println("Song is Mamma. Setting blinkLED flag to true.");
+    // If the song title is "Africa", start blinking the LED
+    if (songTitle == "Africa") {
+        Serial.println("Song is Africa. Setting blinkLED flag to true.");
         blinkLED = true;
+        isBlinking = true; // Set isBlinking to true when starting LED blinking
     } else {
-        // Turn off the LED if the song title is not "Mamma"
-        Serial.println("Song is not Mamma. Keeping blinkLED flag false.");
+        // Turn off the LED if the song title is not "Africa"
+        Serial.println("Song is not Africa. Keeping blinkLED flag false.");
         blinkLED = false;
+        isBlinking = false; // Set isBlinking to false if not blinking
         strip.setPixelColor(0, strip.Color(0, 0, 0));
         strip.show();
     }
 }
-
 
 String parseTemperature(const String& metar) {
     // Find the position of "Temperature: " in the METAR string
@@ -300,90 +302,43 @@ void loop() {
             client.setInsecure(); // Ignore SSL certificate verification
 
             HTTPClient https;
+            https.begin(client, apiUrl);
 
-            Serial.print("Sending HTTP request to: ");
-            Serial.println(apiUrl);
+            int httpCode = https.GET();
 
-            // Save LED state before sending the request
-            uint32_t previousColor = strip.getPixelColor(0);
-            bool previousBlinkState = blinkLED;
+            if (httpCode == HTTP_CODE_OK) {
+                String payload = https.getString();
+                https.end();
 
-            if (https.begin(client, apiUrl)) {
-                int httpCode = https.GET();
+                StaticJsonDocument<1200> doc;
+                DeserializationError error = deserializeJson(doc, payload);
 
-                if (httpCode > 0) {
-                    if (httpCode == HTTP_CODE_OK) {
-                        // Read response into a buffer
-                        String payload = https.getString();
-                        Serial.println("Received JSON data:");
-                        Serial.println(payload); // Print raw JSON data
-
-                        // Parse JSON from the buffer
-                        StaticJsonDocument<1200> doc;
-                        DeserializationError error = deserializeJson(doc, payload);
-
-                        if (!error && doc.is<JsonObject>()) {
-                            JsonObject obj = doc.as<JsonObject>();
-                            handleJsonObject(obj);
-                        } else {
-                            Serial.print("deserializeJson() failed: ");
-                            Serial.println(error.c_str());
-                        }
-                    } else {
-                        Serial.print("HTTP request failed with error code: ");
-                        Serial.println(httpCode);
-                    }
-                } else {
-                    Serial.println("HTTP request failed");
+                if (error) {
+                    Serial.print(F("deserializeJson() failed: "));
+                    Serial.println(error.f_str());
+                    return;
                 }
 
-                https.end();
+                handleJsonObject(doc.as<JsonObject>());
             } else {
-                Serial.println("Unable to connect");
+                Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
-
-            // Restore LED state after the request
-            strip.setPixelColor(0, previousColor);
-            blinkLED = previousBlinkState;
-            strip.show();
         } else {
-            Serial.println("WiFi Disconnected. Reconnecting...");
-            WiFiManager wifiManager;
-            wifiManager.autoConnect("Temperaturlampan");
-            delay(5000);
+            Serial.println("WiFi Disconnected. Skipping song check.");
         }
     }
 
-    // Debugging output for blinkLED flag
-    //Serial.print("Before LED blinking: blinkLED flag: ");
-    //Serial.println(blinkLED);
-
-   // Blink LED if the flag is true
-if (blinkLED) {
-  // Blink LED
-  unsigned long blinkInterval = 500; // Blink interval in milliseconds
-  static bool ledState = false;
-  static unsigned long previousBlinkMillis = 0;
-
-  if (currentMillis - previousBlinkMillis >= blinkInterval) {
-    previousBlinkMillis = currentMillis;
-    ledState = !ledState;
-
-    // Set LED color based on ledState
-    strip.setPixelColor(0, ledState ? strip.Color(255, 255, 255) : strip.Color(0, 0, 0));
-
-    // Print debug info about LED state (optional)
-    Serial.print("LED state: ");
-    Serial.println(ledState ? "On (White)" : "Off (Black)");
-
-    strip.show();
-  }
+    // Blink LED if blinkLED flag is true
+    if (blinkLED) {
+        if (isBlinking) {
+            // If LED is currently off, turn it on. If it's on, turn it off.
+            strip.setPixelColor(0, strip.Color(255, 255, 255)); // White color
+            strip.show();
+            isBlinking = false;
+        } else {
+            strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
+            strip.show();
+            isBlinking = true;
+        }
+    }
 }
-
-    // Debugging output for blinkLED flag after LED blinking
-    //Serial.print("After LED blinking: blinkLED flag: ");
-    //Serial.println(blinkLED);
-
-    delay(100); // Delay for a short time to prevent excessive loop iterations
-}
-

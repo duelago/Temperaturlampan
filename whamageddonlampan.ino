@@ -244,7 +244,7 @@ void setup() {
     delay(2000);
     display.clearDisplay();
     Serial.begin(115200);
-    MDNS.begin("temperaturlampan");
+    MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
 
     // Initialize NeoPixel strip

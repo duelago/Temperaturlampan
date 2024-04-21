@@ -37,6 +37,9 @@ const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme"
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking
 
+unsigned long lastBlinkTime = 0;
+const unsigned long blinkInterval = 500; // Blink interval in milliseconds
+
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
@@ -266,6 +269,9 @@ void setup() {
     server.on("/", HTTP_GET, handleRoot);
     server.on("/submit", HTTP_POST, handleSubmit);
     server.begin();
+
+unsigned long lastBlinkTime = 0;const unsigned long blinkInterval = 500; // Blink interval in milliseconds
+
 }
 
 void loop() {
@@ -309,17 +315,22 @@ void loop() {
         }
     }
 
-    // Blink LED if blinkLED flag is true
+    // Non-blocking LED blinking
     if (blinkLED) {
-        if (isBlinking) {
-            // If LED is currently off, turn it on. If it's on, turn it off.
-            strip.setPixelColor(0, strip.Color(255, 255, 255)); // White color
-            strip.show();
-            isBlinking = false;
-        } else {
-            strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
-            strip.show();
-            isBlinking = true;
+        if (currentMillis - lastBlinkTime >= blinkInterval) {
+            lastBlinkTime = currentMillis;
+            isBlinking = !isBlinking; // Toggle blinking state
+
+            if (isBlinking) {
+                strip.setPixelColor(0, strip.Color(255, 255, 255)); // White color
+                strip.show();
+            } else {
+                strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
+                strip.show();
+            }
         }
     }
+
+    // Handle HTTP server requests
+    server.handleClient();
 }

@@ -4,10 +4,10 @@ En 3D-printad lampa som ändrar färg beroende på yttertemperatur OCH börjar b
 
 Flasha filen whamageddonlampan.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
 
-Temperaturlampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
+Lampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
 Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet (på engelska)
-Lampan kollar även spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. Vill du bevaka en annan låttitel kan du ändra detta i lampans webbinterface. 
+Lampan kollar även spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. 
 
 Här är en video som visar hur det funkar: https://youtu.be/staYxQRvpsY
 

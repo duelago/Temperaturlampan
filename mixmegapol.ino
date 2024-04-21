@@ -1,3 +1,6 @@
+// Exempelfil på hur man hämtar låttitel från Mix Megapol
+
+
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 #include <ESP8266HTTPClient.h>

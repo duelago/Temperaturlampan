@@ -312,6 +312,15 @@ void loop() {
         }
     }
 
+    // Check if 30 minutes have passed since the last METAR data fetch
+    const unsigned long METARFetchInterval = 30 * 60 * 1000; // 30 minutes in milliseconds
+    static unsigned long lastMETARFetchTime = 0;
+
+    if (currentMillis - lastMETARFetchTime >= METARFetchInterval) {
+        lastMETARFetchTime = currentMillis;
+        fetchMETARData();
+    }
+
     // Non-blocking LED blinking
     if (blinkLED) {
         if (currentMillis - lastBlinkTime >= blinkInterval) {

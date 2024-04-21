@@ -44,18 +44,17 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Africa", start blinking the LED
-    if (songTitle == "Africa") {
-        Serial.println("Song is Africa. Setting blinkLED flag to true.");
+    // If the song title is "X", start blinking the LED
+    if (songTitle == "X") {
+        Serial.println("Song is X. Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
     } else {
-        // Turn off the LED if the song title is not "Africa"
-        Serial.println("Song is not Africa. Keeping blinkLED flag false.");
+        // Turn off the LED if the song title is not "X"
+        Serial.println("Song is not X. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
-        strip.setPixelColor(0, strip.Color(0, 0, 0));
-        strip.show();
+        setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
     }
 }
 
@@ -115,7 +114,6 @@ void handleRoot() {
     html += "<div class='container'><h1>METAR-kod:</h1>";
     html += "<div class='input-group'><form method='post' action='/submit'>";
     html += "<input type='text' name='stationCode' placeholder='ESSB' />";
-
     html += "<input type='submit' value='Skicka' />";
     html += "</form>";
     html += "<p>ESGG G&ouml;TEBORG/Landvetter<br>";
@@ -185,6 +183,9 @@ void handleSubmit() {
         EEPROM.write(i, METARStation[i]);
     }
     EEPROM.end();
+
+    // Fetch METAR data immediately after station code submission
+    fetchMETARData();
 
     server.send(200, "text/html", "Stationen uppdaterad. <a href='/'>Tillbaka</a>");
 }
@@ -269,26 +270,6 @@ void setup() {
 
 void loop() {
     unsigned long currentMillis = millis();
-
-    if (currentMillis - previousMillis >= REBOOT_INTERVAL) {
-        // It's time to reboot
-        Serial.println("Rebooting ESP8266...");
-        delay(100); // Print the message before rebooting
-        ESP.restart(); // Reboot the ESP8266
-    }
-
-    MDNS.update();
-    server.handleClient();
-
-    // Fetch METAR data every 30 minutes
-    static unsigned long lastFetchTime = 0;
-    const unsigned long fetchInterval = 1800000;  // 30 minutes in milliseconds
-    unsigned long currentTime = millis();
-
-    if (currentTime - lastFetchTime >= fetchInterval) {
-        lastFetchTime = currentTime;
-        fetchMETARData();
-    }
 
     // Check song title every 30 seconds
     static unsigned long lastCheckTime = 0;

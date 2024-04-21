@@ -44,14 +44,14 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "X", start blinking the LED
-    if (songTitle == "X") {
-        Serial.println("Song is X. Setting blinkLED flag to true.");
+    // If the song title is "White Christmas", start blinking the LED
+    if (songTitle == "White Christmas") {
+        Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
     } else {
         // Turn off the LED if the song title is not "X"
-        Serial.println("Song is not X. Keeping blinkLED flag false.");
+        Serial.println("Song is not White Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data

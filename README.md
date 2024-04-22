@@ -41,7 +41,7 @@ De komponenter som behövs är:
 
 <h1>3D-printad lampa</h1>
 
-![temperaturlampan-tulip](https://github.com/duelago/Temperaturlampan/assets/12539239/1e27401d-4797-4640-9fd7-3ef83dfc9c0f)
+![whamageddonlampan](https://github.com/duelago/Temperaturlampan/assets/12539239/6cb68040-5377-46a6-b174-873620f04d1d)
 
 
 <h1>Julversion</h1>

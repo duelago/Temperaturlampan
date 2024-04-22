@@ -87,17 +87,17 @@ void setLEDColor(float tempLed) {
     uint32_t color = 0;
 
     if (tempLed >= 0 && tempLed <= 5) {
-        color = strip.Color(0, 255, 0); // Grön
+        color = strip.Color(255, 0, 0); // Grön
     } else if (tempLed >= -5 && tempLed < 0) {
         color = strip.Color(0, 0, 255); // Blå
     } else if (tempLed >= -50 && tempLed < -5) {
-        color = strip.Color(255, 0, 255); // Lila
+        color = strip.Color(0, 255, 255); // Lila
     } else if (tempLed >= 6 && tempLed <= 10) {
         color = strip.Color(255, 255, 0); // Gul
     } else if (tempLed >= 11 && tempLed <= 20) {
-        color = strip.Color(255, 153, 0); // Orange 
+        color = strip.Color(153, 255, 0); // Orange 
     } else if (tempLed >= 21 && tempLed <= 60) {
-        color = strip.Color(255, 0, 0); // Röd
+        color = strip.Color(0, 255, 0); // Röd
     }
 
     for (int i = 0; i < NUM_LEDS; i++) {

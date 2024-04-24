@@ -20,6 +20,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define PIN            D4  // Define the pin for WS2811 LEDs
 #define NUM_LEDS       1   // Define the number of LEDs
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
+#define BUZZER_PIN     D5   // Define the pin for the buzzer
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
@@ -28,7 +29,6 @@ ESP8266WebServer server(80);
 char METARStation[EEPROM_SIZE];
 String METAR; // Declare METAR as a global variable
 String songTitle; // Declare songTitle as a global variable
-String submittedSongTitle; // Declare submittedSongTitle as a global variable
 
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
@@ -41,6 +41,11 @@ bool isBlinking = false; // Flag to track if LED is currently blinking
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
+// Buzzer variables
+bool buzz = false; // Flag to control buzzer
+unsigned long lastBuzzTime = 0;
+const unsigned long buzzInterval = 500; // Buzzer interval in milliseconds
+
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
@@ -48,16 +53,19 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // Jämför låttiteln från API:et med den angivna låttiteln från användaren
-    if (submittedSongTitle != "" && songTitle == submittedSongTitle) {
-        Serial.println("Matched submitted song title. Setting blinkLED flag to true.");
+    // If the song title is "Last Christmas", start blinking the LED and buzzing the buzzer
+    if (songTitle == "Last Christmas") {
+        Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
+        buzz = true; // Start buzzing the buzzer
     } else {
-        Serial.println("Submitted song title does not match. Keeping blinkLED flag false.");
+        // Turn off the LED if the song title is not "Last Christmas"
+        Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
+        buzz = false; // Stop buzzing the buzzer
     }
 }
 
@@ -87,17 +95,17 @@ void setLEDColor(float tempLed) {
     uint32_t color = 0;
 
     if (tempLed >= 0 && tempLed <= 5) {
-        color = strip.Color(255, 0, 0); // Grön
+        color = strip.Color(255, 0, 0); // Red
     } else if (tempLed >= -5 && tempLed < 0) {
-        color = strip.Color(0, 0, 255); // Blå
+        color = strip.Color(0, 0, 255); // Blue
     } else if (tempLed >= -50 && tempLed < -5) {
-        color = strip.Color(0, 255, 255); // Lila
+        color = strip.Color(0, 255, 255); // Cyan
     } else if (tempLed >= 6 && tempLed <= 10) {
-        color = strip.Color(255, 255, 0); // Gul
+        color = strip.Color(255, 255, 0); // Yellow
     } else if (tempLed >= 11 && tempLed <= 20) {
-        color = strip.Color(153, 255, 0); // Orange 
+        color = strip.Color(153, 255, 0); // Orange
     } else if (tempLed >= 21 && tempLed <= 60) {
-        color = strip.Color(0, 255, 0); // Röd
+        color = strip.Color(0, 255, 0); // Green
     }
 
     for (int i = 0; i < NUM_LEDS; i++) {
@@ -119,11 +127,6 @@ void handleRoot() {
     html += "<div class='container'><h1>METAR-kod:</h1>";
     html += "<div class='input-group'><form method='post' action='/submit'>";
     html += "<input type='text' name='stationCode' placeholder='ESSB' />";
-    html += "<input type='submit' value='Skicka' />";
-    html += "</form>";
-    html += "<h1>Sångtitel:</h1>"; // Add input field for song title
-    html += "<form method='post' action='/submitSong'>";
-    html += "<input type='text' name='songTitle' placeholder='Last Christmas' />";
     html += "<input type='submit' value='Skicka' />";
     html += "</form>";
     html += "<p>ESGG GöTEBORG/Landvetter<br>";
@@ -178,7 +181,6 @@ void handleRoot() {
     server.send(200, "text/html", html);
 }
 
-// Funktion för att hantera formulärdata som skickas via webbgränssnittet för stationkod
 void handleSubmit() {
     String stationCode = server.arg("stationCode");
 
@@ -201,19 +203,6 @@ void handleSubmit() {
     server.send(200, "text/html", "Stationen uppdaterad. <a href='/'>Tillbaka</a>");
 }
 
-// Funktion för att hantera formulärdata som skickas via webbgränssnittet för låttitel
-void handleSubmitSong() {
-    // Get the song title from form data
-    submittedSongTitle = server.arg("songTitle");
-
-    // Convert the submitted song title to lowercase for easier comparison
-    submittedSongTitle.toLowerCase();
-
-    // Send response to client
-    server.send(200, "text/html", "Låttiteln uppdaterad. <a href='/'>Tillbaka</a>");
-}
-
-// Funktion för att hämta METAR-data från API:et
 void fetchMETARData() {
     // Fetch METAR data using METARStation variable (e.g., "ESSA" or user-defined value)
     WiFiClientSecure client;
@@ -289,7 +278,6 @@ void setup() {
     // Start web server
     server.on("/", HTTP_GET, handleRoot);
     server.on("/submit", HTTP_POST, handleSubmit);
-    server.on("/submitSong", HTTP_POST, handleSubmitSong); // Add handler for song title submission
     server.begin();
 }
 
@@ -350,12 +338,21 @@ void loop() {
             isBlinking = !isBlinking; // Toggle blinking state
 
             if (isBlinking) {
-                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
-                strip.show();
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Red
             } else {
-                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
-                strip.show();
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green
             }
+            strip.show();
+        }
+    }
+
+    // Non-blocking buzzer buzzing
+    if (buzz) {
+        if (currentMillis - lastBuzzTime >= buzzInterval) {
+            lastBuzzTime = currentMillis;
+
+            // Toggle buzzer state
+            digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
         }
     }
 

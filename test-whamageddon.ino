@@ -20,7 +20,6 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define PIN            D4  // Define the pin for WS2811 LEDs
 #define NUM_LEDS       1   // Define the number of LEDs
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
-#define BUZZER_PIN     D5   // Define the pin for the buzzer
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
@@ -41,11 +40,6 @@ bool isBlinking = false; // Flag to track if LED is currently blinking
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
-// Buzzer variables
-bool buzz = false; // Flag to control buzzer
-unsigned long lastBuzzTime = 0;
-const unsigned long buzzInterval = 500; // Buzzer interval in milliseconds
-
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
@@ -53,19 +47,17 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Last Christmas", start blinking the LED and buzzing the buzzer
-    if (songTitle == "Last Christmas") {
+    // If the song title is "Unforgettable", start blinking the LED
+    if (songTitle == "Unforgettable") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
-        buzz = true; // Start buzzing the buzzer
     } else {
-        // Turn off the LED if the song title is not "Last Christmas"
-        Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
+        // Turn off the LED if the song title is not "X"
+        Serial.println("Song is not Unforgettable. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
-        buzz = false; // Stop buzzing the buzzer
     }
 }
 
@@ -95,17 +87,17 @@ void setLEDColor(float tempLed) {
     uint32_t color = 0;
 
     if (tempLed >= 0 && tempLed <= 5) {
-        color = strip.Color(255, 0, 0); // Red
+        color = strip.Color(255, 0, 0); // Grön
     } else if (tempLed >= -5 && tempLed < 0) {
-        color = strip.Color(0, 0, 255); // Blue
+        color = strip.Color(0, 0, 255); // Blå
     } else if (tempLed >= -50 && tempLed < -5) {
-        color = strip.Color(0, 255, 255); // Cyan
+        color = strip.Color(0, 255, 255); // Lila
     } else if (tempLed >= 6 && tempLed <= 10) {
-        color = strip.Color(255, 255, 0); // Yellow
+        color = strip.Color(255, 255, 0); // Gul
     } else if (tempLed >= 11 && tempLed <= 20) {
-        color = strip.Color(153, 255, 0); // Orange
+        color = strip.Color(153, 255, 0); // Orange 
     } else if (tempLed >= 21 && tempLed <= 60) {
-        color = strip.Color(0, 255, 0); // Green
+        color = strip.Color(0, 255, 0); // Röd
     }
 
     for (int i = 0; i < NUM_LEDS; i++) {
@@ -338,21 +330,25 @@ void loop() {
             isBlinking = !isBlinking; // Toggle blinking state
 
             if (isBlinking) {
-                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Red
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
+                strip.show();
             } else {
-                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+                strip.show();
             }
-            strip.show();
         }
-    }
-
-    // Non-blocking buzzer buzzing
-    if (buzz) {
-        if (currentMillis - lastBuzzTime >= buzzInterval) {
-            lastBuzzTime = currentMillis;
-
-            // Toggle buzzer state
-            digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
+        // Add buzzer functionality when blinkLED is true
+        if (songTitle == "Last Christmas") {
+            // Buzz the buzzer twice
+            for (int i = 0; i < 2; i++) {
+                digitalWrite(14, HIGH); // switch on buzzer
+                delay(100); // wait 0.1 second
+                digitalWrite(14, LOW); // switch off buzzer
+                delay(100); // wait 0.1 second
+            }
+        } else {
+            // Turn off the buzzer
+            digitalWrite(14, LOW); // switch off buzzer
         }
     }
 

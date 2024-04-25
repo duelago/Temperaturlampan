@@ -343,19 +343,41 @@ void loop() {
         }
     }
 
-    // Add buzzer functionality when blinkLED is true
-    if (blinkLED && songTitle == "Unforgettable") {
+unsigned long buzzerStartTime = 0; // Variable to store the start time of buzzer
+const unsigned long buzzerDuration = 1000; // Buzzer duration in milliseconds
+
+// Add buzzer functionality when blinkLED is true
+if (blinkLED && songTitle == "Unforgettable") {
+    // Check if the buzzer duration has elapsed
+    if (currentMillis - buzzerStartTime <= buzzerDuration) {
         // Buzz the buzzer twice
-        for (int i = 0; i < 2; i++) {
-            digitalWrite(BUZZER_PIN, HIGH); // switch on buzzer
-            delay(100); // wait 0.1 second
-            digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
-            delay(100); // wait 0.1 second
-        }
+        digitalWrite(BUZZER_PIN, HIGH); // switch on buzzer
     } else {
         // Turn off the buzzer
         digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
     }
+
+    // Check if it's the start of the buzzer operation
+    if (currentMillis - lastBlinkTime >= blinkInterval) {
+        lastBlinkTime = currentMillis;
+        isBlinking = !isBlinking; // Toggle blinking state
+
+        if (isBlinking) {
+            strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
+            strip.show();
+        } else {
+            strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+            strip.show();
+        }
+
+        // Update the buzzer start time
+        buzzerStartTime = currentMillis;
+    }
+} else {
+    // Turn off the buzzer
+    digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
+}
+
 
     // Handle HTTP server requests
     server.handleClient();

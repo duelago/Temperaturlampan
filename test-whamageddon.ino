@@ -21,6 +21,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define NUM_LEDS       1   // Define the number of LEDs
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
+#define BUZZER_PIN     D5   // Buzzer pin
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 ESP8266WebServer server(80);
@@ -47,13 +48,13 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Unforgettable", start blinking the LED
+    // If the song title is "Last Christmas", start blinking the LED
     if (songTitle == "Unforgettable") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
     } else {
-        // Turn off the LED if the song title is not "X"
+        // Turn off the LED if the song title is not "Last Christmas"
         Serial.println("Song is not Unforgettable. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
@@ -253,6 +254,9 @@ void setup() {
     strip.begin();
     strip.show();  // Initialize all pixels to 'off'
 
+    // Initialize buzzer pin
+    pinMode(BUZZER_PIN, OUTPUT);
+
     // Use WiFiManager to set WiFi credentials if they are not already configured
     WiFiManager wifiManager;
     wifiManager.autoConnect("Temperaturlampan");
@@ -337,19 +341,20 @@ void loop() {
                 strip.show();
             }
         }
-        // Add buzzer functionality when blinkLED is true
-        if (songTitle == "Last Christmas") {
-            // Buzz the buzzer twice
-            for (int i = 0; i < 2; i++) {
-                digitalWrite(14, HIGH); // switch on buzzer
-                delay(100); // wait 0.1 second
-                digitalWrite(14, LOW); // switch off buzzer
-                delay(100); // wait 0.1 second
-            }
-        } else {
-            // Turn off the buzzer
-            digitalWrite(14, LOW); // switch off buzzer
+    }
+
+    // Add buzzer functionality when blinkLED is true
+    if (blinkLED && songTitle == "Unforgettable") {
+        // Buzz the buzzer twice
+        for (int i = 0; i < 2; i++) {
+            digitalWrite(BUZZER_PIN, HIGH); // switch on buzzer
+            delay(100); // wait 0.1 second
+            digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
+            delay(100); // wait 0.1 second
         }
+    } else {
+        // Turn off the buzzer
+        digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
     }
 
     // Handle HTTP server requests

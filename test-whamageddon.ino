@@ -224,19 +224,12 @@ void fetchMETARData() {
         Serial.print(tempLed);
         Serial.println(" degrees Celsius.");
 
-        display.cp437(true);
-        display.clearDisplay();
-        display.setTextSize(2);
-        display.setTextColor(WHITE);
-        display.setCursor(25, 15);
-        display.print(int(tempLed));
-
-        display.display();
-
         // Set LED color based on temperature
+        Serial.println("Setting LED color...");
         setLEDColor(tempLed);
-        
+
         // Turn on the LED
+        Serial.println("Turning on the LED...");
         strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
         strip.show();
     } else {
@@ -244,6 +237,7 @@ void fetchMETARData() {
         https.end();
     }
 }
+
 
 
 void setup() {

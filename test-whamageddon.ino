@@ -235,11 +235,16 @@ void fetchMETARData() {
 
         // Set LED color based on temperature
         setLEDColor(tempLed);
+        
+        // Turn on the LED
+        strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+        strip.show();
     } else {
         Serial.println("Failed to fetch METAR data");
         https.end();
     }
 }
+
 
 void setup() {
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);

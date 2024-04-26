@@ -348,35 +348,44 @@ const unsigned long buzzerDuration = 1000; // Buzzer duration in milliseconds
 
 // Add buzzer functionality when blinkLED is true
 if (blinkLED && songTitle == "Unforgettable") {
-    // Check if the buzzer duration has elapsed
-    if (currentMillis - buzzerStartTime <= buzzerDuration) {
-        // Buzz the buzzer twice
-        digitalWrite(BUZZER_PIN, HIGH); // switch on buzzer
-    } else {
-        // Turn off the buzzer
-        digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
+    // Check if it's the start of the buzzer operation
+    if (!isBlinking) {
+        // Start the buzzer operation
+        buzzerStartTime = currentMillis;
+        isBlinking = true; // Set the flag to true to indicate buzzer operation
+
+        // Turn on the buzzer
+        digitalWrite(BUZZER_PIN, HIGH);
     }
 
-    // Check if it's the start of the buzzer operation
+    // Check if the buzzer duration has elapsed
+    if (currentMillis - buzzerStartTime >= buzzerDuration) {
+        // Turn off the buzzer
+        digitalWrite(BUZZER_PIN, LOW);
+        isBlinking = false; // Reset the flag after buzzer duration
+    }
+
+    // Toggle the LED if necessary
     if (currentMillis - lastBlinkTime >= blinkInterval) {
         lastBlinkTime = currentMillis;
-        isBlinking = !isBlinking; // Toggle blinking state
-
         if (isBlinking) {
-            strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
-            strip.show();
+            // Toggle LED color
+            strip.setPixelColor(0, strip.Color(255, 0, 0)); // Red
         } else {
-            strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
-            strip.show();
+            // Set LED to off
+            strip.setPixelColor(0, strip.Color(0, 0, 0)); // Off
         }
-
-        // Update the buzzer start time
-        buzzerStartTime = currentMillis;
+        strip.show();
     }
 } else {
-    // Turn off the buzzer
-    digitalWrite(BUZZER_PIN, LOW); // switch off buzzer
+    // If blinkLED is false or songTitle is not "Unforgettable", turn off the buzzer and reset the flag
+    digitalWrite(BUZZER_PIN, LOW);
+    isBlinking = false;
+    // Turn off the LED
+    strip.setPixelColor(0, strip.Color(0, 0, 0)); // Off
+    strip.show();
 }
+
 
 
     // Handle HTTP server requests

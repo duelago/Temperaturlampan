@@ -42,6 +42,9 @@ bool isBlinking = false; // Flag to track if LED is currently blinking
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
+bool gpio14State = LOW; // Initial state of GPIO 14
+unsigned long lastHighTime = 0; // Time when GPIO 14 was last set to HIGH
+
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
@@ -54,6 +57,11 @@ void handleJsonObject(JsonObject obj) {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
+        
+        // Set GPIO 14 to high and update lastHighTime
+        digitalWrite(GPIO14, HIGH);
+        gpio14State = HIGH;
+        lastHighTime = millis();
         
         // Set GPIO 14 to high for 0.5 seconds to buzz
         digitalWrite(GPIO14, HIGH);
@@ -304,7 +312,8 @@ void loop() {
                 String payload = https.getString();
                 https.end();
 
-                StaticJsonDocument<1200> doc;
+                StaticJsonDocument
+                <1200> doc;
                 DeserializationError error = deserializeJson(doc, payload);
 
                 if (error) {
@@ -313,7 +322,8 @@ void loop() {
                     return;
                 }
 
-                handleJsonObject(doc.as<JsonObject>());
+                handleJsonObject(doc.as
+                <JsonObject>());
             } else {
                 Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
@@ -329,6 +339,13 @@ void loop() {
     if (currentMillis - lastMETARFetchTime >= METARFetchInterval) {
         lastMETARFetchTime = currentMillis;
         fetchMETARData();
+    }
+
+    // Timer for GPIO 14
+    const unsigned long timerInterval = 45 * 60 * 1000; // 45 minutes in milliseconds
+    if (currentMillis - lastHighTime >= timerInterval && gpio14State == HIGH) {
+        digitalWrite(GPIO14, LOW); // Set GPIO 14 to LOW after 45 minutes
+        gpio14State = LOW;
     }
 
     // Non-blocking LED blinking

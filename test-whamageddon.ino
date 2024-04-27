@@ -21,7 +21,8 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define NUM_LEDS       1   // Define the number of LEDs
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
-#define BUZZER_PIN     D5   // Buzzer pin
+
+#define GPIO14         14  // Define GPIO 14 pin
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 ESP8266WebServer server(80);
@@ -53,9 +54,14 @@ void handleJsonObject(JsonObject obj) {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
+        
+        // Set GPIO 14 to high for 1 second
+        digitalWrite(GPIO14, HIGH);
+        delay(1000);
+        digitalWrite(GPIO14, LOW);
     } else {
-        // Turn off the LED if the song title is not "Last Christmas"
-        Serial.println("Song is not Unforgettable. Keeping blinkLED flag false.");
+        // Turn off the LED if the song title is not "X"
+        Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
@@ -224,21 +230,22 @@ void fetchMETARData() {
         Serial.print(tempLed);
         Serial.println(" degrees Celsius.");
 
-        // Set LED color based on temperature
-        Serial.println("Setting LED color...");
-        setLEDColor(tempLed);
+        display.cp437(true);
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setTextColor(WHITE);
+        display.setCursor(25, 15);
+        display.print(int(tempLed));
 
-        // Turn on the LED
-        Serial.println("Turning on the LED...");
-        strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
-        strip.show();
+        display.display();
+
+        // Set LED color based on temperature
+        setLEDColor(tempLed);
     } else {
         Serial.println("Failed to fetch METAR data");
         https.end();
     }
 }
-
-
 
 void setup() {
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -248,13 +255,11 @@ void setup() {
     Serial.begin(115200);
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
+    pinMode(GPIO14, OUTPUT);
 
     // Initialize NeoPixel strip
     strip.begin();
     strip.show();  // Initialize all pixels to 'off'
-
-    // Initialize buzzer pin
-    pinMode(BUZZER_PIN, OUTPUT);
 
     // Use WiFiManager to set WiFi credentials if they are not already configured
     WiFiManager wifiManager;
@@ -341,51 +346,6 @@ void loop() {
             }
         }
     }
-
-unsigned long buzzerStartTime = 0; // Variable to store the start time of buzzer
-const unsigned long buzzerDuration = 1000; // Buzzer duration in milliseconds
-
-// Add buzzer functionality when blinkLED is true
-if (blinkLED && songTitle == "Unforgettable") {
-    // Check if it's the start of the buzzer operation
-    if (!isBlinking) {
-        // Start the buzzer operation
-        buzzerStartTime = currentMillis;
-        isBlinking = true; // Set the flag to true to indicate buzzer operation
-
-        // Turn on the buzzer
-        digitalWrite(BUZZER_PIN, HIGH);
-    }
-
-    // Check if the buzzer duration has elapsed
-    if (currentMillis - buzzerStartTime >= buzzerDuration) {
-        // Turn off the buzzer
-        digitalWrite(BUZZER_PIN, LOW);
-        isBlinking = false; // Reset the flag after buzzer duration
-    }
-
-    // Toggle the LED if necessary
-    if (currentMillis - lastBlinkTime >= blinkInterval) {
-        lastBlinkTime = currentMillis;
-        if (isBlinking) {
-            // Toggle LED color
-            strip.setPixelColor(0, strip.Color(255, 0, 0)); // Red
-        } else {
-            // Set LED to off
-            strip.setPixelColor(0, strip.Color(0, 0, 0)); // Off
-        }
-        strip.show();
-    }
-} else {
-    // If blinkLED is false or songTitle is not "Unforgettable", turn off the buzzer and reset the flag
-    digitalWrite(BUZZER_PIN, LOW);
-    isBlinking = false;
-    // Turn off the LED
-    strip.setPixelColor(0, strip.Color(0, 0, 0)); // Off
-    strip.show();
-}
-
-
 
     // Handle HTTP server requests
     server.handleClient();

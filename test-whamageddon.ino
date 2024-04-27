@@ -55,9 +55,9 @@ void handleJsonObject(JsonObject obj) {
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
         
-        // Set GPIO 14 to high for 1 second
+        // Set GPIO 14 to high for 0.5 seconds to buzz
         digitalWrite(GPIO14, HIGH);
-        delay(1000);
+        delay(500);
         digitalWrite(GPIO14, LOW);
     } else {
         // Turn off the LED if the song title is not "X"

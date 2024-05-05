@@ -22,14 +22,13 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
 
-#define GPIO14         14  // Define GPIO 14 pin
-
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 ESP8266WebServer server(80);
 
 char METARStation[EEPROM_SIZE];
 String METAR; // Declare METAR as a global variable
 String songTitle; // Declare songTitle as a global variable
+bool songTitleFlag = false; // Flag to track if song title flag is set
 
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
@@ -42,8 +41,11 @@ bool isBlinking = false; // Flag to track if LED is currently blinking
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
-bool gpio14State = LOW; // Initial state of GPIO 14
-unsigned long lastHighTime = 0; // Time when GPIO 14 was last set to HIGH
+// GPIO14 control variables
+const int GPIO14 = 14;
+bool GPIO14High = false;
+unsigned long GPIO14LastHigh = 0;
+const unsigned long GPIO14Cooldown = 60 * 60 * 1000; // 60 minutes cooldown for GPIO14
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
@@ -52,27 +54,28 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Last Christmas", start blinking the LED
-    if (songTitle == "Unforgettable") {
+    // If the song title is "Last Christmas", start blinking the LED and set GPIO14 flag
+    if (songTitle == "Last Christmas") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
-        
-        // Set GPIO 14 to high and update lastHighTime
-        digitalWrite(GPIO14, HIGH);
-        gpio14State = HIGH;
-        lastHighTime = millis();
-        
-        // Set GPIO 14 to high for 0.5 seconds to buzz
+        songTitleFlag = true; // Set songTitleFlag to true
+        // Pull GPIO14 high for 0.5 seconds
         digitalWrite(GPIO14, HIGH);
         delay(500);
         digitalWrite(GPIO14, LOW);
+        GPIO14High = true;
+        GPIO14LastHigh = millis();
     } else {
         // Turn off the LED if the song title is not "X"
         Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
+        // Check if GPIO14 needs to be reset
+        if (GPIO14High && (millis() - GPIO14LastHigh >= GPIO14Cooldown)) {
+            GPIO14High = false;
+        }
     }
 }
 
@@ -263,7 +266,8 @@ void setup() {
     Serial.begin(115200);
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
-    pinMode(GPIO14, OUTPUT);
+
+    pinMode(GPIO14, OUTPUT); // Set GPIO14 as output
 
     // Initialize NeoPixel strip
     strip.begin();
@@ -312,8 +316,7 @@ void loop() {
                 String payload = https.getString();
                 https.end();
 
-                StaticJsonDocument
-                <1200> doc;
+                StaticJsonDocument<1200> doc;
                 DeserializationError error = deserializeJson(doc, payload);
 
                 if (error) {
@@ -322,8 +325,7 @@ void loop() {
                     return;
                 }
 
-                handleJsonObject(doc.as
-                <JsonObject>());
+                handleJsonObject(doc.as<JsonObject>());
             } else {
                 Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
@@ -341,13 +343,6 @@ void loop() {
         fetchMETARData();
     }
 
-    // Timer for GPIO 14
-    const unsigned long timerInterval = 45 * 60 * 1000; // 45 minutes in milliseconds
-    if (currentMillis - lastHighTime >= timerInterval && gpio14State == HIGH) {
-        digitalWrite(GPIO14, LOW); // Set GPIO 14 to LOW after 45 minutes
-        gpio14State = LOW;
-    }
-
     // Non-blocking LED blinking
     if (blinkLED) {
         if (currentMillis - lastBlinkTime >= blinkInterval) {
@@ -361,6 +356,14 @@ void loop() {
                 strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
                 strip.show();
             }
+        }
+    }
+
+    // Handle GPIO14 control
+    if (songTitleFlag) {
+        // Check if GPIO14 has been high for 60 minutes, if so reset flag
+        if (GPIO14High && (currentMillis - GPIO14LastHigh >= GPIO14Cooldown)) {
+            GPIO14High = false;
         }
     }
 

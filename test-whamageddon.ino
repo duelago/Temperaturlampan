@@ -59,10 +59,6 @@ void handleJsonObject(JsonObject obj) {
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
         songTitleFlag = true; // Set songTitleFlag to true
-        // Pull D5 high for 0.3 seconds
-        digitalWrite(D5, HIGH);
-        D5High = true;
-        D5StartTime = millis(); // Record the start time
     } else {
         // Turn off the LED if the song title is not "X"
         Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
@@ -98,17 +94,17 @@ void setLEDColor(float tempLed) {
     uint32_t color = 0;
 
     if (tempLed >= 0 && tempLed <= 5) {
-        color = strip.Color(255, 0, 0); // Grön
+        color = strip.Color(255, 0, 0); // Red
     } else if (tempLed >= -5 && tempLed < 0) {
-        color = strip.Color(0, 0, 255); // Blå
+        color = strip.Color(0, 0, 255); // Blue
     } else if (tempLed >= -50 && tempLed < -5) {
-        color = strip.Color(0, 255, 255); // Lila
+        color = strip.Color(0, 255, 255); // Cyan
     } else if (tempLed >= 6 && tempLed <= 10) {
-        color = strip.Color(255, 255, 0); // Gul
+        color = strip.Color(255, 255, 0); // Yellow
     } else if (tempLed >= 11 && tempLed <= 20) {
         color = strip.Color(153, 255, 0); // Orange 
     } else if (tempLed >= 21 && tempLed <= 60) {
-        color = strip.Color(0, 255, 0); // Röd
+        color = strip.Color(0, 255, 0); // Green
     }
 
     for (int i = 0; i < NUM_LEDS; i++) {
@@ -260,7 +256,7 @@ void setup() {
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
 
-    pinMode(D5, OUTPUT); // Set D5 as output
+    pinMode(GPIO14, OUTPUT); // Set GPIO14 (D5) as output
 
     // Initialize NeoPixel strip
     strip.begin();
@@ -343,27 +339,28 @@ void loop() {
             isBlinking = !isBlinking; // Toggle blinking state
 
             if (isBlinking) {
-                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Red
                 strip.show();
             } else {
-                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green
                 strip.show();
             }
         }
     }
 
-    // Handle D5 control
+    // Handle GPIO14 (D5) control
     if (songTitleFlag) {
-        // If D5 is not high, set it to high and start the timer
+        // If GPIO14 (D5) is not high, set it to high and start the timer
         if (!D5High) {
-            digitalWrite(D5, HIGH);
+            digitalWrite(GPIO14, HIGH);
             D5High = true;
             D5StartTime = currentMillis; // Record the start time
         }
-        // Check if D5 has been high for the specified duration, if so reset flag
+        // Check if GPIO14 (D5) has been high for the specified duration, if so reset flag
         if (D5High && (currentMillis - D5StartTime >= D5Duration)) {
-            digitalWrite(D5, LOW);
+            digitalWrite(GPIO14, LOW);
             D5High = false;
+            songTitleFlag = false; // Reset the flag
         }
     }
 

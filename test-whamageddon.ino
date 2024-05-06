@@ -361,8 +361,15 @@ void loop() {
 
     // Handle GPIO14 control
     if (songTitleFlag) {
+        // If GPIO14 is not high, set it to high and start the cooldown timer
+        if (!GPIO14High) {
+            digitalWrite(GPIO14, HIGH);
+            GPIO14High = true;
+            GPIO14LastHigh = currentMillis;
+        }
         // Check if GPIO14 has been high for 60 minutes, if so reset flag
         if (GPIO14High && (currentMillis - GPIO14LastHigh >= GPIO14Cooldown)) {
+            digitalWrite(GPIO14, LOW);
             GPIO14High = false;
         }
     }

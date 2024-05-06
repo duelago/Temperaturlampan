@@ -34,17 +34,17 @@ const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in millis
 unsigned long previousMillis = 0;
 
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
-
+const int GPIO14 = D5;
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking
 
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
-// GPIO14 control variables
-bool GPIO14High = false;
-unsigned long GPIO14StartTime = 0;
-const unsigned long GPIO14Duration = 300; // 0.3 seconds duration for GPIO14 high
+// D5 control variables
+bool D5High = false;
+unsigned long D5StartTime = 0;
+const unsigned long D5Duration = 300; // 0.3 seconds duration for D5 high
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
@@ -53,16 +53,16 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Last Christmas", start blinking the LED and set GPIO14 flag
-    if (songTitle == "Last Christmas") {
+    // If the song title is "Last Christmas", start blinking the LED and set D5 flag
+    if (songTitle == "Unforgettable") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
         songTitleFlag = true; // Set songTitleFlag to true
-        // Pull GPIO14 high for 0.3 seconds
-        digitalWrite(GPIO14, HIGH);
-        GPIO14High = true;
-        GPIO14StartTime = millis(); // Record the start time
+        // Pull D5 high for 0.3 seconds
+        digitalWrite(D5, HIGH);
+        D5High = true;
+        D5StartTime = millis(); // Record the start time
     } else {
         // Turn off the LED if the song title is not "X"
         Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
@@ -260,7 +260,7 @@ void setup() {
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
 
-    pinMode(GPIO14, OUTPUT); // Set GPIO14 as output
+    pinMode(D5, OUTPUT); // Set D5 as output
 
     // Initialize NeoPixel strip
     strip.begin();
@@ -352,18 +352,18 @@ void loop() {
         }
     }
 
-    // Handle GPIO14 control
+    // Handle D5 control
     if (songTitleFlag) {
-        // If GPIO14 is not high, set it to high and start the timer
-        if (!GPIO14High) {
-            digitalWrite(GPIO14, HIGH);
-            GPIO14High = true;
-            GPIO14StartTime = currentMillis; // Record the start time
+        // If D5 is not high, set it to high and start the timer
+        if (!D5High) {
+            digitalWrite(D5, HIGH);
+            D5High = true;
+            D5StartTime = currentMillis; // Record the start time
         }
-        // Check if GPIO14 has been high for the specified duration, if so reset flag
-        if (GPIO14High && (currentMillis - GPIO14StartTime >= GPIO14Duration)) {
-            digitalWrite(GPIO14, LOW);
-            GPIO14High = false;
+        // Check if D5 has been high for the specified duration, if so reset flag
+        if (D5High && (currentMillis - D5StartTime >= D5Duration)) {
+            digitalWrite(D5, LOW);
+            D5High = false;
         }
     }
 

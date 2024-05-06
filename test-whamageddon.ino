@@ -42,10 +42,9 @@ unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
 // GPIO14 control variables
-const int GPIO14 = 14;
 bool GPIO14High = false;
-unsigned long GPIO14LastHigh = 0;
-const unsigned long GPIO14Cooldown = 60 * 60 * 1000; // 60 minutes cooldown for GPIO14
+unsigned long GPIO14StartTime = 0;
+const unsigned long GPIO14Duration = 300; // 0.3 seconds duration for GPIO14 high
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
@@ -60,22 +59,16 @@ void handleJsonObject(JsonObject obj) {
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
         songTitleFlag = true; // Set songTitleFlag to true
-        // Pull GPIO14 high for 0.5 seconds
+        // Pull GPIO14 high for 0.3 seconds
         digitalWrite(GPIO14, HIGH);
-        delay(500);
-        digitalWrite(GPIO14, LOW);
         GPIO14High = true;
-        GPIO14LastHigh = millis();
+        GPIO14StartTime = millis(); // Record the start time
     } else {
         // Turn off the LED if the song title is not "X"
         Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
-        // Check if GPIO14 needs to be reset
-        if (GPIO14High && (millis() - GPIO14LastHigh >= GPIO14Cooldown)) {
-            GPIO14High = false;
-        }
     }
 }
 
@@ -361,14 +354,14 @@ void loop() {
 
     // Handle GPIO14 control
     if (songTitleFlag) {
-        // If GPIO14 is not high, set it to high and start the cooldown timer
+        // If GPIO14 is not high, set it to high and start the timer
         if (!GPIO14High) {
             digitalWrite(GPIO14, HIGH);
             GPIO14High = true;
-            GPIO14LastHigh = currentMillis;
+            GPIO14StartTime = currentMillis; // Record the start time
         }
-        // Check if GPIO14 has been high for 60 minutes, if so reset flag
-        if (GPIO14High && (currentMillis - GPIO14LastHigh >= GPIO14Cooldown)) {
+        // Check if GPIO14 has been high for the specified duration, if so reset flag
+        if (GPIO14High && (currentMillis - GPIO14StartTime >= GPIO14Duration)) {
             digitalWrite(GPIO14, LOW);
             GPIO14High = false;
         }

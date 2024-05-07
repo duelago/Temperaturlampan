@@ -28,45 +28,56 @@ ESP8266WebServer server(80);
 char METARStation[EEPROM_SIZE];
 String METAR; // Declare METAR as a global variable
 String songTitle; // Declare songTitle as a global variable
-bool songTitleFlag = false; // Flag to track if song title flag is set
 
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
 
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
-const int GPIO14 = D5;
+
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking
 
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
-// D5 control variables
-bool D5High = false;
-unsigned long D5StartTime = 0;
-const unsigned long D5Duration = 300; // 0.3 seconds duration for D5 high
+// New variables
+bool gpio14Enabled = true; // To allow or block GPIO14 activation
+unsigned long lastActivationTime = 0; // Timestamp of the last activation of GPIO14
+const unsigned long interval60Min = 60 * 60 * 1000; // 60 minutes in milliseconds
 
-// Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
     songTitle = trackTitle;
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Last Christmas", start blinking the LED and set D5 flag
-    if (songTitle == "Unforgettable") {
-        Serial.println("Whamageddon!! Setting blinkLED flag to true.");
-        blinkLED = true;
-        isBlinking = true; // Set isBlinking to true when starting LED blinking
-        songTitleFlag = true; // Set songTitleFlag to true
-    } else {
-        // Turn off the LED if the song title is not "X"
-        Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
-        blinkLED = false;
-        isBlinking = false; // Set isBlinking to false if not blinking
-        setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
+    // If the song title is "Last Christmas" and 60 minutes have passed
+    if (songTitle == "Unforgettable" && gpio14Enabled) {
+        Serial.println("Whamageddon!! Activating GPIO14.");
+       
+        // Pull GPIO14 high for 0.5 seconds
+        digitalWrite(14, HIGH);
+        delay(300); // Hold GPIO14 high for 0.5 seconds
+        digitalWrite(14, LOW);
+
+        // Update timestamp and disable further activation for 60 minutes
+        lastActivationTime = millis();
+        gpio14Enabled = false;
+    }
+
+    // Update LED color based on current METAR data
+    if (!isBlinking) {
+        setLEDColor(parseTemperature(METAR).toFloat());
     }
 }
+
+// Function to update the GPIO14 enabling status
+void checkGPIO14Enable() {
+    if (!gpio14Enabled && millis() - lastActivationTime >= interval60Min) {
+        gpio14Enabled = true;
+    }
+}
+
 
 String parseTemperature(const String& metar) {
     // Find the position of "Temperature: " in the METAR string
@@ -94,17 +105,17 @@ void setLEDColor(float tempLed) {
     uint32_t color = 0;
 
     if (tempLed >= 0 && tempLed <= 5) {
-        color = strip.Color(255, 0, 0); // Red
+        color = strip.Color(255, 0, 0); // Grön
     } else if (tempLed >= -5 && tempLed < 0) {
-        color = strip.Color(0, 0, 255); // Blue
+        color = strip.Color(0, 0, 255); // Blå
     } else if (tempLed >= -50 && tempLed < -5) {
-        color = strip.Color(0, 255, 255); // Cyan
+        color = strip.Color(0, 255, 255); // Lila
     } else if (tempLed >= 6 && tempLed <= 10) {
-        color = strip.Color(255, 255, 0); // Yellow
+        color = strip.Color(255, 255, 0); // Gul
     } else if (tempLed >= 11 && tempLed <= 20) {
         color = strip.Color(153, 255, 0); // Orange 
     } else if (tempLed >= 21 && tempLed <= 60) {
-        color = strip.Color(0, 255, 0); // Green
+        color = strip.Color(0, 255, 0); // Röd
     }
 
     for (int i = 0; i < NUM_LEDS; i++) {
@@ -256,8 +267,6 @@ void setup() {
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
 
-    pinMode(GPIO14, OUTPUT); // Set GPIO14 (D5) as output
-
     // Initialize NeoPixel strip
     strip.begin();
     strip.show();  // Initialize all pixels to 'off'
@@ -339,31 +348,16 @@ void loop() {
             isBlinking = !isBlinking; // Toggle blinking state
 
             if (isBlinking) {
-                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Red
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
                 strip.show();
             } else {
-                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
                 strip.show();
             }
         }
     }
-
-    // Handle GPIO14 (D5) control
-    if (songTitleFlag) {
-        // If GPIO14 (D5) is not high, set it to high and start the timer
-        if (!D5High) {
-            digitalWrite(GPIO14, HIGH);
-            D5High = true;
-            D5StartTime = currentMillis; // Record the start time
-        }
-        // Check if GPIO14 (D5) has been high for the specified duration, if so reset flag
-        if (D5High && (currentMillis - D5StartTime >= D5Duration)) {
-            digitalWrite(GPIO14, LOW);
-            D5High = false;
-            songTitleFlag = false; // Reset the flag
-        }
-    }
-
+    
+ checkGPIO14Enable();
     // Handle HTTP server requests
     server.handleClient();
 }

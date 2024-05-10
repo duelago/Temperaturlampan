@@ -47,14 +47,15 @@ const unsigned long interval60Min = 60 * 60 * 1000; // 60 minutes in millisecond
 bool gpio14High = false;  // To check if GPIO14 is currently high
 unsigned long lastHighTime = 0;  // To record when GPIO14 was last set high
 
+// Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
     songTitle = trackTitle;
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Last Christmas" and 60 minutes have passed
-    if (songTitle == "Unforgettable" && gpio14Enabled) {
+    // If the song title is "Last Christmas" and GPIO14 activation is enabled
+    if (songTitle == "Hälsa Gud" && gpio14Enabled) {
         Serial.println("Whamageddon!! Activating GPIO14.");
         digitalWrite(14, HIGH);  // Set GPIO14 high
         lastHighTime = millis();  // Record the time GPIO14 was set high
@@ -64,7 +65,6 @@ void handleJsonObject(JsonObject obj) {
         lastActivationTime = millis();
         gpio14Enabled = false;
     }
-
 
     // Update LED color based on current METAR data
     if (!isBlinking) {
@@ -78,7 +78,6 @@ void checkGPIO14Enable() {
         gpio14Enabled = true;
     }
 }
-
 
 String parseTemperature(const String& metar) {
     // Find the position of "Temperature: " in the METAR string
@@ -267,9 +266,6 @@ void setup() {
     Serial.begin(115200);
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
-    
-    // GPIO Pin Initialization
-    pinMode(14, OUTPUT);
 
     // Initialize NeoPixel strip
     strip.begin();
@@ -301,13 +297,6 @@ void loop() {
     // Check song title every 30 seconds
     static unsigned long lastCheckTime = 0;
     const unsigned long checkInterval = 30000;  // 30 seconds in milliseconds
-    
-    checkGPIO14Enable(); // Call this function to update the GPIO14 enabling status
-    
-    if (gpio14High && millis() - lastHighTime >= 500) {
-        digitalWrite(14, LOW);  // Set GPIO14 low
-        gpio14High = false;  // Update flag to indicate GPIO14 is now low
-    }
 
     if (currentMillis - lastCheckTime >= checkInterval) {
         lastCheckTime = currentMillis;
@@ -352,24 +341,25 @@ void loop() {
         fetchMETARData();
     }
 
-    // Handle HTTP server requests
-    server.handleClient();
-
-    // Toggle LED between red and green if blinkLED flag is true
+    // Non-blocking LED blinking
     if (blinkLED) {
         if (currentMillis - lastBlinkTime >= blinkInterval) {
             lastBlinkTime = currentMillis;
-            static bool isRed = true; // Flag to track LED color
+            isBlinking = !isBlinking; // Toggle blinking state
 
-            if (isRed) {
-                // Set LED color to green
-                setLEDColor(0); // Assuming 0 represents green in your setLEDColor function
+            if (isBlinking) {
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
+                strip.show();
             } else {
-                // Set LED color to red
-                setLEDColor(255); // Assuming 255 represents red in your setLEDColor function
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+                strip.show();
             }
-
-            isRed = !isRed; // Toggle LED color
         }
     }
+
+    // Handle GPIO14 activation
+    checkGPIO14Enable();
+
+    // Handle HTTP server requests
+    server.handleClient();
 }

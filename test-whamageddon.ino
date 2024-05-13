@@ -40,6 +40,10 @@ bool isBlinking = false; // Flag to track if LED is currently blinking
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
+bool songPlayed = false; // Flag to track if song has been played
+unsigned long lastSongPlayTime = 0; // Timer for last song play time
+const unsigned long songPlayInterval = 60 * 60 * 1000; // 1 hour in milliseconds
+
 // Arduino note for complete Last Christmas by Wham
 
 const int tempo = 120; // beats per minute
@@ -90,7 +94,7 @@ const int durations[] = {
   4, 4, 4, 4,
 };
 
-const int pin = D5; // Pin D5
+const int buzzerPin = D5; // Pin D5
 
 void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -104,6 +108,9 @@ void setup() {
   // Initialize NeoPixel strip
   strip.begin();
   strip.show();  // Initialize all pixels to 'off'
+
+  // Configure the tone pin
+  pinMode(buzzerPin, OUTPUT);
 
   // Use WiFiManager to set WiFi credentials if they are not already configured
   WiFiManager wifiManager;
@@ -166,43 +173,37 @@ void loop() {
     }
   }
 
-  // Check if 30 minutes have passed since the last METAR data fetch
-  const unsigned long METARFetchInterval = 30 * 60 * 1000; // 30 minutes in milliseconds
-  static unsigned long lastMETARFetchTime = 0;
-
-  if (currentMillis - lastMETARFetchTime >= METARFetchInterval) {
-    lastMETARFetchTime = currentMillis;
-    fetchMETARData();
+  // Check if it's time to play the song again
+  if (songPlayed && currentMillis - lastSongPlayTime >= songPlayInterval) {
+    songPlayed = false; // Reset the flag to play the song
   }
 
-  // Non-blocking LED blinking
-  if (blinkLED) {
+  // Check if the LED should blink
+  if (blinkLED || (songPlayed && !isBlinking)) {
     if (currentMillis - lastBlinkTime >= blinkInterval) {
       lastBlinkTime = currentMillis;
       isBlinking = !isBlinking; // Toggle blinking state
 
       if (isBlinking) {
-        strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
-        strip.show();
-        playSong(); // Play the song when LED blinks
+        // If the song is not playing, blink the LED
+        if (!songPlayed) {
+          strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
+          strip.show();
+        }
       } else {
-        strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+        strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
         strip.show();
-        noTone(pin); // Stop playing the song when LED stops blinking
       }
     }
   }
 
+  // Play the song if the song title is set to true and it hasn't been played recently
+  if (songTitle == "Last Christmas" && !songPlayed) {
+    playSong();
+  }
+
   // Handle HTTP server requests
   server.handleClient();
-}
-
-void playSong() {
-  // Play each note in the sequence
-  for (int i = 0; i < sizeof(notes) / sizeof(notes[0]); i++) {
-    tone(pin, notes[i], durations[i] * 60000 / tempo);
-    delay(durations[i] * 60000 / tempo);
-  }
 }
 
 // Callback function to handle the JSON object
@@ -212,13 +213,14 @@ void handleJsonObject(JsonObject obj) {
   Serial.print("Received Track Title: ");
   Serial.println(songTitle);
 
-  // If the song title is "Last Christmas", start blinking the LED
-  if (songTitle == "Bättre Nu") {
+  // If the song title is "Last Christmas", start blinking the LED and set the songPlayed flag to false
+  if (songTitle == "Last Christmas") {
     Serial.println("Whamageddon!! Setting blinkLED flag to true.");
     blinkLED = true;
     isBlinking = true; // Set isBlinking to true when starting LED blinking
+    songPlayed = false; // Reset the flag indicating the song has been played
   } else {
-    // Turn off the LED if the song title is not "X"
+    // Turn off the LED if the song title is not "Last Christmas". Keep the blinkLED flag false.
     Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
     blinkLED = false;
     isBlinking = false; // Set isBlinking to false if not blinking
@@ -226,6 +228,7 @@ void handleJsonObject(JsonObject obj) {
   }
 }
 
+// Function to parse temperature from METAR string
 String parseTemperature(const String& metar) {
   // Find the position of "Temperature: " in the METAR string
   int tempPos = metar.indexOf("Temperature: ");
@@ -248,6 +251,7 @@ String parseTemperature(const String& metar) {
   return "";
 }
 
+// Function to set LED color based on temperature
 void setLEDColor(float tempLed) {
   uint32_t color = 0;
 
@@ -271,127 +275,13 @@ void setLEDColor(float tempLed) {
   strip.show();
 }
 
-void handleRoot() {
-  String html = "<html><head><meta charset='UTF-8'><style>";
-  html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
-  html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
-  html += ".input-group { margin-bottom: 20px; }";
-  html += ".input-group input[type='text'] { width: 80%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }";
-  html += ".input-group input[type='submit'] { width: 18%; padding: 8px; font-size: 16px; border: none; background-color: #4caf50; color: #ffffff; cursor: pointer; border-radius: 5px; }";
-  html += ".metar-info { font-size: 18px; margin-top: 20px; }";
-  html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
-  html += "</style></head><body>";
-  html += "<div class='container'><h1>METAR-kod:</h1>";
-  html += "<div class='input-group'><form method='post' action='/submit'>";
-  html += "<input type='text' name='stationCode' placeholder='ESSB' />";
-  html += "<input type='submit' value='Skicka' />";
-  html += "</form>";
-  html += "<p>ESGG GöTEBORG/Landvetter<br>";
-  html += "ESOK KARLSTAD<br>";
-  html += "ESNQ KIRUNA<br>";
-  html += "ESMS MALMö<br>";
-  html += "ESSA STOCKHOLM/Arlanda<br>";
-  html += "ESSB STOCKHOLM/Bromma<br>";
-  html += "ESKN STOCKHOLM/Skavsta<br>";
-  html += "ESOW STOCKHOLM/Västerås<br>";
-  html += "<p>";
-  html += "ESNX Arvidsjaur<br>";
-  html += "ESSD Borlänge<br>";
-  html += "ESNG Gällivare<br>";
-  html += "ESMT Halmstad (F14)<br>";
-  html += "ESUT Hemavan<br>";
-  html += "ESGJ Jönköping<br>";
-  html += "ESMQ Kalmar (F12)<br>";
-  html += "ESNK Kramfors/Sollefteå<br>";
-  html += "ESMK Kristianstad/Everöd<br>";
-  html += "ESCF Linköping/Malmen (F3)<br>";
-  html += "ESTL Ljungbyhed (F5)<br>";
-  html += "ESPA Luleå/Kallax<br>";
-  html += "ESMH Mora/Siljan<br>";
-  html += "ESNZ Örnsköldsvik<br>";
-  html += "ESGY Östersund/Frösön<br>";
-  html += "ESGK Skövde<br>";
-  html += "ESSE Uppsala<br>";
-  html += "ESSF Hagshult (F17)<br>";
-  html += "ESSV Visby<br>";
-  html += "<p>";
-  html += "ESFI Arvidsjaur<br>";
-  html += "ESFH Barkarby<br>";
-  html += "ESFI Frösön<br>";
-  html += "ESFQ Hallviken<br>";
-  html += "ESFH Hemavan<br>";
-  html += "ESFK Jokkmokk<br>";
-  html += "ESUJ Jukkasjärvi<br>";
-  html += "ESGT Siljansnäs<br>";
-  html += "ESFR Sundsvall-Härnösand<br>";
-  html += "ESVQ Sveg<br>";
-  html += "ESGC Tierp<br>";
-  html += "ESGL Vidsel<br>";
-  html += "</div>";
-  html += "<div class='metar-info'>";
-  html += "<h2>Aktuell METAR för ";
-  html += METARStation;
-  html += ":</h2>";
-  html += METAR;
-  html += "</div>";
-  html += "<a href='/update' class='update-link'>Uppdatera lampans mjukvara</a>";
-  html += "</div></body></html>";
-  server.send(200, "text/html", html);
-}
-
-void handleSubmit() {
-  if (server.hasArg("stationCode")) {
-    String code = server.arg("stationCode");
-    code.toCharArray(METARStation, EEPROM_SIZE);
-
-    EEPROM.begin(EEPROM_SIZE);
-    for (int i = 0; i < EEPROM_SIZE; ++i) {
-      EEPROM.write(i, METARStation[i]);
-    }
-    EEPROM.end();
-
-    Serial.print("New METAR station code set: ");
-    Serial.println(METARStation);
+// Function to play the song once
+void playSong() {
+  for (int i = 0; i < sizeof(notes) / sizeof(notes[0]); i++) {
+    tone(buzzerPin, notes[i], durations[i] * 60000 / tempo);
+    delay(durations[i] * 60000 / tempo);
   }
-  server.sendHeader("Location", String("/"), true);
-  server.send(303, "text/plain", "Redirecting to /");
-}
 
-void fetchMETARData() {
-  // Send HTTP request to obtain METAR data
-  String url = "http://tgftp.nws.noaa.gov/data/observations/metar/stations/";
-  url += METARStation;
-  url += ".TXT";
-
-  Serial.print("Sending request to URL: ");
-  Serial.println(url);
-
-  WiFiClient client;
-  if (client.connect("tgftp.nws.noaa.gov", 80)) {
-    client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-                 "Host: tgftp.nws.noaa.gov\r\n" +
-                 "Connection: close\r\n\r\n");
-    delay(500);
-
-    // Read response from server
-    String response = "";
-    while (client.available()) {
-      String line = client.readStringUntil('\r');
-      response += line;
-    }
-
-    // Extract METAR data from response
-    int startPos = response.indexOf("METAR ");
-    if (startPos != -1) {
-      METAR = response.substring(startPos + 6);
-      Serial.print("Received METAR data: ");
-      Serial.println(METAR);
-    } else {
-      Serial.println("Failed to parse METAR data.");
-    }
-
-    client.stop();
-  } else {
-    Serial.println("Failed to connect to server.");
-  }
+  songPlayed = true; // Set the flag indicating the song has been played
+  lastSongPlayTime = millis(); // Record the time the song was played
 }

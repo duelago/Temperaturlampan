@@ -1,73 +1,93 @@
-// Arduino note for complete Last Christmas by Wham
 
-const int tempo = 120; // beats per minute
+void song(int buzzerPin){
+  
+  tone(buzzerPin, 330);
+  delay(602);
+  noTone(buzzerPin);
 
-// Notes for Last Christmas
-const int notes[] = {
-  262, 392, 440, 349, // Frequencies for C4, G4, A4, F4
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698, // Frequencies for C5, G5, A5, F5
+  tone(buzzerPin, 330);
+  delay(365);
+  noTone(buzzerPin);
 
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698,
+  tone(buzzerPin, 294);
+  delay(434);
+  noTone(buzzerPin);
 
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698,
+  tone(buzzerPin, 220);
+  delay(255);
+  noTone(buzzerPin);
 
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698,
-};
+  tone(buzzerPin, 330);
+  delay(203);
+  noTone(buzzerPin);
 
-// Durations for Last Christmas
-const int durations[] = {
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
+  tone(buzzerPin, 330);
+  delay(203);
+  noTone(buzzerPin);
 
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
+  tone(buzzerPin, 370);
+  delay(226);
+  noTone(buzzerPin);
 
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
+  tone(buzzerPin, 294);
+  delay(781);
+  noTone(buzzerPin);
 
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-};
+  tone(buzzerPin, 247);
+  delay(185);
+  noTone(buzzerPin);
 
-const int pin = 5; // Pin D5
+  tone(buzzerPin, 247);
+  delay(226);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(243);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(249);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 370);
+  delay(336);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(625);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(203);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 277);
+  delay(237);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(220);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 277);
+  delay(214);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 247);
+  delay(1169);
+  noTone(buzzerPin);
+
+ 
+
+  
+}
 
 void setup() {
-  // Set the tempo
-  Serial.begin(9600);
-  Serial.println("Ready to play Last Christmas by Wham...");
-
-  // Configure the tone pin
-  pinMode(pin, OUTPUT);
+  // put your setup code here, to run once:
+  // call the song function with digital pin
+  song(14);
 }
 
 void loop() {
-  // Check if pin D5 is high
-  if (digitalRead(pin) == HIGH) {
-    // Play each note in the sequence
-    for (int i = 0; i < sizeof(notes) / sizeof(notes[0]); i++) {
-      tone(pin, notes[i], durations[i] * 60000 / tempo);
-      delay(durations[i] * 60000 / tempo);
-    }
-    // Wait a short while before playing the sequence again
-    delay(1000);
-  }
+  // put your main code here, to run repeatedly:
 }

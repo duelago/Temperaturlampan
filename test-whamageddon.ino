@@ -14,12 +14,12 @@
 #include <ElegantOTA.h>
 
 #define OLED_RESET 0
+
 Adafruit_SSD1306 display(OLED_RESET);
 
 #define PIN            D4  // Define the pin for WS2811 LEDs
-#define BUZZER_PIN     D5  // Define the pin for the buzzer
 #define NUM_LEDS       1   // Define the number of LEDs
-#define LED_BRIGHTNESS 255 // Define LED brightness (0-255)
+#define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
@@ -37,13 +37,87 @@ const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme"
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking
 
-bool buzzBuzzer = false; // Flag to control buzzer
-unsigned long lastBuzzTime = 0; // Timestamp for the last buzzer activation
-const unsigned long buzzDuration = 500; // Duration to buzz in milliseconds
-const unsigned long buzzCooldown = 60 * 60 * 1000; // Cooldown period for the buzzer in milliseconds
-
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
+
+void song(int buzzerPin){
+  
+  tone(buzzerPin, 330);
+  delay(602);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(365);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(434);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 220);
+  delay(255);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(203);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(203);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 370);
+  delay(226);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(781);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 247);
+  delay(185);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 247);
+  delay(226);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(243);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 330);
+  delay(249);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 370);
+  delay(336);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(625);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(203);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 277);
+  delay(237);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 294);
+  delay(220);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 277);
+  delay(214);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 247);
+  delay(1169);
+  noTone(buzzerPin);
+  }
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {
@@ -52,19 +126,13 @@ void handleJsonObject(JsonObject obj) {
     Serial.print("Received Track Title: ");
     Serial.println(songTitle);
 
-    // If the song title is "Last Christmas", start blinking the LED and buzzing the buzzer
-    if (songTitle == "Last Christmas") {
+    // If the song title is "Last Christmas", start blinking the LED
+    if (songTitle == "Unforgettable") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
-
-        // Check if one hour has passed since the last buzz
-        if (millis() - lastBuzzTime >= buzzCooldown) {
-            buzzBuzzer = true;
-            lastBuzzTime = millis(); // Reset the cooldown timer
-        }
     } else {
-        // Turn off the LED if the song title is not "Last Christmas"
+        // Turn off the LED if the song title is not "X"
         Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
@@ -73,16 +141,24 @@ void handleJsonObject(JsonObject obj) {
 }
 
 String parseTemperature(const String& metar) {
+    // Find the position of "Temperature: " in the METAR string
     int tempPos = metar.indexOf("Temperature: ");
     if (tempPos != -1) {
+        // Extract the substring starting from "Temperature: "
         String tempSubstring = metar.substring(tempPos);
+
+        // Find the position of "(" and ")" to extract the Celsius temperature
         int openParenthesisPos = tempSubstring.indexOf('(');
         int closeParenthesisPos = tempSubstring.indexOf(')');
+
         if (openParenthesisPos != -1 && closeParenthesisPos != -1) {
+            // Extract the substring between "(" and ")"
             String celsiusString = tempSubstring.substring(openParenthesisPos + 1, closeParenthesisPos);
             return celsiusString;
         }
     }
+
+    // Return an empty string if parsing fails
     return "";
 }
 
@@ -199,6 +275,7 @@ void handleSubmit() {
 }
 
 void fetchMETARData() {
+    // Fetch METAR data using METARStation variable (e.g., "ESSA" or user-defined value)
     WiFiClientSecure client;
     client.setInsecure(); // Ignore SSL certificate verification
 
@@ -212,6 +289,7 @@ void fetchMETARData() {
         METAR = https.getString();
         https.end();
 
+        // For testing purposes, print METAR data
         Serial.println("Fetching METAR data...");
         Serial.println(METAR);
 
@@ -219,6 +297,7 @@ void fetchMETARData() {
         String temperature = parseTemperature(METAR);
         float tempLed = temperature.toFloat();
 
+        // Print the temperature to the serial port
         Serial.print("The temperature is ");
         Serial.print(tempLed);
         Serial.println(" degrees Celsius.");
@@ -240,10 +319,8 @@ void fetchMETARData() {
     }
 }
 
-void setup() {
-    pinMode(BUZZER_PIN, OUTPUT); // Initialize the buzzer pin
-    digitalWrite(BUZZER_PIN, LOW); // Ensure buzzer is off initially
 
+void setup() {
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.display();
     delay(2000);
@@ -252,24 +329,30 @@ void setup() {
     MDNS.begin("whamageddonlampan");
     ElegantOTA.begin(&server);
 
+    // Initialize NeoPixel strip
     strip.begin();
     strip.show();  // Initialize all pixels to 'off'
 
+    // Use WiFiManager to set WiFi credentials if they are not already configured
     WiFiManager wifiManager;
     wifiManager.autoConnect("Temperaturlampan");
 
+    // Load METAR station code from EEPROM
     EEPROM.begin(EEPROM_SIZE);
     for (int i = 0; i < EEPROM_SIZE; ++i) {
         METARStation[i] = EEPROM.read(i);
     }
     EEPROM.end();
 
+    // Fetch METAR data as soon as possible after boot
     fetchMETARData();
 
+    // Start web server
     server.on("/", HTTP_GET, handleRoot);
     server.on("/submit", HTTP_POST, handleSubmit);
     server.begin();
 }
+
 
 void loop() {
     unsigned long currentMillis = millis();
@@ -304,6 +387,12 @@ void loop() {
                 }
 
                 handleJsonObject(doc.as<JsonObject>());
+
+                // Check if the song title is set to true and call the song function
+                if (songTitle == "Unforgettable") {
+                    Serial.println("Playing song...");
+                    song(14); // Change pin number if needed
+                }
             } else {
                 Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
@@ -337,16 +426,7 @@ void loop() {
         }
     }
 
-    // Buzzer logic
-    if (buzzBuzzer) {
-        if (currentMillis - lastBuzzTime < buzzDuration) {
-            digitalWrite(BUZZER_PIN, HIGH); // Turn on the buzzer
-        } else {
-            digitalWrite(BUZZER_PIN, LOW); // Turn off the buzzer after 0.5 seconds
-            buzzBuzzer = false; // Reset buzzer flag
-        }
-    }
-
     // Handle HTTP server requests
     server.handleClient();
 }
+

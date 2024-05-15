@@ -14,12 +14,12 @@
 #include <ElegantOTA.h>
 
 #define OLED_RESET 0
-
 Adafruit_SSD1306 display(OLED_RESET);
 
 #define PIN            D4  // Define the pin for WS2811 LEDs
+#define BUZZER_PIN     D5  // Define the pin for the buzzer
 #define NUM_LEDS       1   // Define the number of LEDs
-#define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
+#define LED_BRIGHTNESS 255 // Define LED brightness (0-255)
 #define EEPROM_SIZE    5   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
@@ -37,251 +37,316 @@ const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme"
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking
 
+bool buzzBuzzer = false; // Flag to control buzzer
+unsigned long lastBuzzTime = 0; // Timestamp for the last buzzer activation
+const unsigned long buzzDuration = 500; // Duration to buzz in milliseconds
+const unsigned long buzzCooldown = 60 * 60 * 1000; // Cooldown period for the buzzer in milliseconds
+
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
-bool songPlayed = false; // Flag to track if song has been played
-unsigned long lastSongPlayTime = 0; // Timer for last song play time
-const unsigned long songPlayInterval = 60 * 60 * 1000; // 1 hour in milliseconds
+// Callback function to handle the JSON object
+void handleJsonObject(JsonObject obj) {
+    const char* trackTitle = obj["TrackTitle"];
+    songTitle = trackTitle;
+    Serial.print("Received Track Title: ");
+    Serial.println(songTitle);
 
-// Arduino note for complete Last Christmas by Wham
+    // If the song title is "Last Christmas", start blinking the LED and buzzing the buzzer
+    if (songTitle == "Last Christmas") {
+        Serial.println("Whamageddon!! Setting blinkLED flag to true.");
+        blinkLED = true;
+        isBlinking = true; // Set isBlinking to true when starting LED blinking
 
-const int tempo = 120; // beats per minute
+        // Check if one hour has passed since the last buzz
+        if (millis() - lastBuzzTime >= buzzCooldown) {
+            buzzBuzzer = true;
+            lastBuzzTime = millis(); // Reset the cooldown timer
+        }
+    } else {
+        // Turn off the LED if the song title is not "Last Christmas"
+        Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
+        blinkLED = false;
+        isBlinking = false; // Set isBlinking to false if not blinking
+        setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
+    }
+}
 
-// Notes for Last Christmas
-const int notes[] = {
-  262, 392, 440, 349, // Frequencies for C4, G4, A4, F4
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698, // Frequencies for C5, G5, A5, F5
+String parseTemperature(const String& metar) {
+    int tempPos = metar.indexOf("Temperature: ");
+    if (tempPos != -1) {
+        String tempSubstring = metar.substring(tempPos);
+        int openParenthesisPos = tempSubstring.indexOf('(');
+        int closeParenthesisPos = tempSubstring.indexOf(')');
+        if (openParenthesisPos != -1 && closeParenthesisPos != -1) {
+            String celsiusString = tempSubstring.substring(openParenthesisPos + 1, closeParenthesisPos);
+            return celsiusString;
+        }
+    }
+    return "";
+}
 
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698,
+void setLEDColor(float tempLed) {
+    uint32_t color = 0;
 
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698,
+    if (tempLed >= 0 && tempLed <= 5) {
+        color = strip.Color(255, 0, 0); // Grön
+    } else if (tempLed >= -5 && tempLed < 0) {
+        color = strip.Color(0, 0, 255); // Blå
+    } else if (tempLed >= -50 && tempLed < -5) {
+        color = strip.Color(0, 255, 255); // Lila
+    } else if (tempLed >= 6 && tempLed <= 10) {
+        color = strip.Color(255, 255, 0); // Gul
+    } else if (tempLed >= 11 && tempLed <= 20) {
+        color = strip.Color(153, 255, 0); // Orange 
+    } else if (tempLed >= 21 && tempLed <= 60) {
+        color = strip.Color(0, 255, 0); // Röd
+    }
 
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  262, 392, 440, 349,
-  523, 784, 880, 698,
-};
+    for (int i = 0; i < NUM_LEDS; i++) {
+        strip.setPixelColor(i, color);
+    }
+    strip.show();
+}
 
-// Durations for Last Christmas
-const int durations[] = {
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
+void handleRoot() {
+    String html = "<html><head><meta charset='UTF-8'><style>";
+    html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }";
+    html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
+    html += ".input-group { margin-bottom: 20px; }";
+    html += ".input-group input[type='text'] { width: 80%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }";
+    html += ".input-group input[type='submit'] { width: 18%; padding: 8px; font-size: 16px; border: none; background-color: #4caf50; color: #ffffff; cursor: pointer; border-radius: 5px; }";
+    html += ".metar-info { font-size: 18px; margin-top: 20px; }";
+    html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
+    html += "</style></head><body>";
+    html += "<div class='container'><h1>METAR-kod:</h1>";
+    html += "<div class='input-group'><form method='post' action='/submit'>";
+    html += "<input type='text' name='stationCode' placeholder='ESSB' />";
+    html += "<input type='submit' value='Skicka' />";
+    html += "</form>";
+    html += "<p>ESGG GöTEBORG/Landvetter<br>";
+    html += "ESOK KARLSTAD<br>";
+    html += "ESNQ KIRUNA<br>";
+    html += "ESMS MALMö<br>";
+    html += "ESSA STOCKHOLM/Arlanda<br>";
+    html += "ESSB STOCKHOLM/Bromma<br>";
+    html += "ESKN STOCKHOLM/Skavsta<br>";
+    html += "ESOW STOCKHOLM/Västerås<br>";
+    html += "<p>";
+    html += "ESNX Arvidsjaur<br>";
+    html += "ESSD Borlänge<br>";
+    html += "ESNG Gällivare<br>";
+    html += "ESMT Halmstad (F14)<br>";
+    html += "ESUT Hemavan<br>";
+    html += "ESGJ Jönköping<br>";
+    html += "ESMQ Kalmar (F12)<br>";
+    html += "ESNK Kramfors/Sollefteå<br>";
+    html += "ESMK Kristianstad/Everöd<br>";
+    html += "ESCF Linköping/Malmen (F3)<br>";
+    html += "ESTL Ljungbyhed (F5)<br>";
+    html += "ESPA Luleå (F21)<br>";
+    html += "ESNL Lycksele<br>";
+    html += "ESSP Norrköping/Kungsängen<br>";
+    html += "ESUP Pajala<br>";
+    html += "ESDF Ronneby (F17)<br>";
+    html += "ESNS Skellefteå<br>";
+    html += "ESGR Skövde<br>";
+    html += "ESNN Sundsvall-Timrå<br>";
+    html += "ESIB Såtenäs (F7)<br>";
+    html += "ESKS Sälen<br>";
+    html += "ESGT Trollhättan-Vänersborg<br>";
+    html += "ESNU Umeå<br>";
+    html += "ESNV Vilhelmina<br>";
+    html += "ESSV Visby<br>";
+    html += "ESMX Växjö/Kronoberg<br>";
+    html += "ESTA Ängelholm/Barkåkra (F10)<br>";
+    html += "ESOE Örebro<br>";
+    html += "ESNO Örnsköldsvik/Gideå<br>";
+    html += "ESNZ Östersund/Frösön (F4)";
+    html += "</div>";
+    html += "<div class='metar-info'>Senaste METAR:<br>";
+    html += METAR;
+    html += "<p>Låt just nu: ";
+    html += songTitle;
+    html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
+    html += "Version 0.5 Whamageddonlampan<br>";
+    html += "</div>";
+    html += "</body></html>";
 
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
+    server.send(200, "text/html", html);
+}
 
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
+void handleSubmit() {
+    String stationCode = server.arg("stationCode");
 
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-  4, 4, 4, 4,
-};
+    // Convert the input station code to uppercase
+    stationCode.toUpperCase();
 
-const int buzzerPin = D5; // Pin D5
+    // Copy the uppercase station code to METARStation variable
+    stationCode.toCharArray(METARStation, EEPROM_SIZE);
+
+    // Update EEPROM with the new METAR station code
+    EEPROM.begin(EEPROM_SIZE);
+    for (int i = 0; i < EEPROM_SIZE; ++i) {
+        EEPROM.write(i, METARStation[i]);
+    }
+    EEPROM.end();
+
+    // Fetch METAR data immediately after station code submission
+    fetchMETARData();
+
+    server.send(200, "text/html", "Stationen uppdaterad. <a href='/'>Tillbaka</a>");
+}
+
+void fetchMETARData() {
+    WiFiClientSecure client;
+    client.setInsecure(); // Ignore SSL certificate verification
+
+    HTTPClient https;
+    String url = "https://tgftp.nws.noaa.gov/data/observations/metar/decoded/" + String(METARStation) + ".TXT";
+    https.begin(client, url); // Use ::begin(WiFiClient, url) syntax
+
+    int httpCode = https.GET();
+
+    if (httpCode == HTTP_CODE_OK) {
+        METAR = https.getString();
+        https.end();
+
+        Serial.println("Fetching METAR data...");
+        Serial.println(METAR);
+
+        // Parse the temperature from the METAR string
+        String temperature = parseTemperature(METAR);
+        float tempLed = temperature.toFloat();
+
+        Serial.print("The temperature is ");
+        Serial.print(tempLed);
+        Serial.println(" degrees Celsius.");
+
+        display.cp437(true);
+        display.clearDisplay();
+        display.setTextSize(2);
+        display.setTextColor(WHITE);
+        display.setCursor(25, 15);
+        display.print(int(tempLed));
+
+        display.display();
+
+        // Set LED color based on temperature
+        setLEDColor(tempLed);
+    } else {
+        Serial.println("Failed to fetch METAR data");
+        https.end();
+    }
+}
 
 void setup() {
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  display.display();
-  delay(2000);
-  display.clearDisplay();
-  Serial.begin(115200);
-  MDNS.begin("whamageddonlampan");
-  ElegantOTA.begin(&server);
+    pinMode(BUZZER_PIN, OUTPUT); // Initialize the buzzer pin
+    digitalWrite(BUZZER_PIN, LOW); // Ensure buzzer is off initially
 
-  // Initialize NeoPixel strip
-  strip.begin();
-  strip.show();  // Initialize all pixels to 'off'
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    display.display();
+    delay(2000);
+    display.clearDisplay();
+    Serial.begin(115200);
+    MDNS.begin("whamageddonlampan");
+    ElegantOTA.begin(&server);
 
-  // Configure the tone pin
-  pinMode(buzzerPin, OUTPUT);
+    strip.begin();
+    strip.show();  // Initialize all pixels to 'off'
 
-  // Use WiFiManager to set WiFi credentials if they are not already configured
-  WiFiManager wifiManager;
-  wifiManager.autoConnect("Temperaturlampan");
+    WiFiManager wifiManager;
+    wifiManager.autoConnect("Temperaturlampan");
 
-  // Load METAR station code from EEPROM
-  EEPROM.begin(EEPROM_SIZE);
-  for (int i = 0; i < EEPROM_SIZE; ++i) {
-    METARStation[i] = EEPROM.read(i);
-  }
-  EEPROM.end();
+    EEPROM.begin(EEPROM_SIZE);
+    for (int i = 0; i < EEPROM_SIZE; ++i) {
+        METARStation[i] = EEPROM.read(i);
+    }
+    EEPROM.end();
 
-  // Fetch METAR data as soon as possible after boot
-  fetchMETARData();
+    fetchMETARData();
 
-  // Start web server
-  server.on("/", HTTP_GET, handleRoot);
-  server.on("/submit", HTTP_POST, handleSubmit);
-  server.begin();
+    server.on("/", HTTP_GET, handleRoot);
+    server.on("/submit", HTTP_POST, handleSubmit);
+    server.begin();
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
+    unsigned long currentMillis = millis();
 
-  // Check song title every 30 seconds
-  static unsigned long lastCheckTime = 0;
-  const unsigned long checkInterval = 30000;  // 30 seconds in milliseconds
+    // Check song title every 30 seconds
+    static unsigned long lastCheckTime = 0;
+    const unsigned long checkInterval = 30000;  // 30 seconds in milliseconds
 
-  if (currentMillis - lastCheckTime >= checkInterval) {
-    lastCheckTime = currentMillis;
+    if (currentMillis - lastCheckTime >= checkInterval) {
+        lastCheckTime = currentMillis;
 
-    if (WiFi.status() == WL_CONNECTED) {
-      WiFiClientSecure client;
-      client.setInsecure(); // Ignore SSL certificate verification
+        if (WiFi.status() == WL_CONNECTED) {
+            WiFiClientSecure client;
+            client.setInsecure(); // Ignore SSL certificate verification
 
-      HTTPClient https;
-      https.begin(client, apiUrl);
+            HTTPClient https;
+            https.begin(client, apiUrl);
 
-      int httpCode = https.GET();
+            int httpCode = https.GET();
 
-      if (httpCode == HTTP_CODE_OK) {
-        String payload = https.getString();
-        https.end();
+            if (httpCode == HTTP_CODE_OK) {
+                String payload = https.getString();
+                https.end();
 
-        StaticJsonDocument<1200> doc;
-        DeserializationError error = deserializeJson(doc, payload);
+                StaticJsonDocument<1200> doc;
+                DeserializationError error = deserializeJson(doc, payload);
 
-        if (error) {
-          Serial.print(F("deserializeJson() failed: "));
-          Serial.println(error.f_str());
-          return;
+                if (error) {
+                    Serial.print(F("deserializeJson() failed: "));
+                    Serial.println(error.f_str());
+                    return;
+                }
+
+                handleJsonObject(doc.as<JsonObject>());
+            } else {
+                Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
+            }
+        } else {
+            Serial.println("WiFi Disconnected. Skipping song check.");
         }
-
-        handleJsonObject(doc.as<JsonObject>());
-      } else {
-        Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
-      }
-    } else {
-      Serial.println("WiFi Disconnected. Skipping song check.");
     }
-  }
 
-  // Check if it's time to play the song again
-  if (songPlayed && currentMillis - lastSongPlayTime >= songPlayInterval) {
-    songPlayed = false; // Reset the flag to play the song
-  }
+    // Check if 30 minutes have passed since the last METAR data fetch
+    const unsigned long METARFetchInterval = 30 * 60 * 1000; // 30 minutes in milliseconds
+    static unsigned long lastMETARFetchTime = 0;
 
-  // Check if the LED should blink
-  if (blinkLED || (songPlayed && !isBlinking)) {
-    if (currentMillis - lastBlinkTime >= blinkInterval) {
-      lastBlinkTime = currentMillis;
-      isBlinking = !isBlinking; // Toggle blinking state
+    if (currentMillis - lastMETARFetchTime >= METARFetchInterval) {
+        lastMETARFetchTime = currentMillis;
+        fetchMETARData();
+    }
 
-      if (isBlinking) {
-        // If the song is not playing, blink the LED
-        if (!songPlayed) {
-          strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
-          strip.show();
+    // Non-blocking LED blinking
+    if (blinkLED) {
+        if (currentMillis - lastBlinkTime >= blinkInterval) {
+            lastBlinkTime = currentMillis;
+            isBlinking = !isBlinking; // Toggle blinking state
+
+            if (isBlinking) {
+                strip.setPixelColor(0, strip.Color(255, 0, 0)); // Röd
+                strip.show();
+            } else {
+                strip.setPixelColor(0, strip.Color(0, 255, 0)); // Grön
+                strip.show();
+            }
         }
-      } else {
-        strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
-        strip.show();
-      }
     }
-  }
 
-  // Play the song if the song title is set to true and it hasn't been played recently
-  if (songTitle == "Last Christmas" && !songPlayed) {
-    playSong();
-  }
-
-  // Handle HTTP server requests
-  server.handleClient();
-}
-
-// Callback function to handle the JSON object
-void handleJsonObject(JsonObject obj) {
-  const char* trackTitle = obj["TrackTitle"];
-  songTitle = trackTitle;
-  Serial.print("Received Track Title: ");
-  Serial.println(songTitle);
-
-  // If the song title is "Last Christmas", start blinking the LED and set the songPlayed flag to false
-  if (songTitle == "Last Christmas") {
-    Serial.println("Whamageddon!! Setting blinkLED flag to true.");
-    blinkLED = true;
-    isBlinking = true; // Set isBlinking to true when starting LED blinking
-    songPlayed = false; // Reset the flag indicating the song has been played
-  } else {
-    // Turn off the LED if the song title is not "Last Christmas". Keep the blinkLED flag false.
-    Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
-    blinkLED = false;
-    isBlinking = false; // Set isBlinking to false if not blinking
-    setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
-  }
-}
-
-// Function to parse temperature from METAR string
-String parseTemperature(const String& metar) {
-  // Find the position of "Temperature: " in the METAR string
-  int tempPos = metar.indexOf("Temperature: ");
-  if (tempPos != -1) {
-    // Extract the substring starting from "Temperature: "
-    String tempSubstring = metar.substring(tempPos);
-
-    // Find the position of "(" and ")" to extract the Celsius temperature
-    int openParenthesisPos = tempSubstring.indexOf('(');
-    int closeParenthesisPos = tempSubstring.indexOf(')');
-
-    if (openParenthesisPos != -1 && closeParenthesisPos != -1) {
-      // Extract the substring between "(" and ")"
-      String celsiusString = tempSubstring.substring(openParenthesisPos + 1, closeParenthesisPos);
-      return celsiusString;
+    // Buzzer logic
+    if (buzzBuzzer) {
+        if (currentMillis - lastBuzzTime < buzzDuration) {
+            digitalWrite(BUZZER_PIN, HIGH); // Turn on the buzzer
+        } else {
+            digitalWrite(BUZZER_PIN, LOW); // Turn off the buzzer after 0.5 seconds
+            buzzBuzzer = false; // Reset buzzer flag
+        }
     }
-  }
 
-  // Return an empty string if parsing fails
-  return "";
-}
-
-// Function to set LED color based on temperature
-void setLEDColor(float tempLed) {
-  uint32_t color = 0;
-
-  if (tempLed >= 0 && tempLed <= 5) {
-    color = strip.Color(255, 0, 0); // Grön
-  } else if (tempLed >= -5 && tempLed < 0) {
-    color = strip.Color(0, 0, 255); // Blå
-  } else if (tempLed >= -50 && tempLed < -5) {
-    color = strip.Color(0, 255, 255); // Lila
-  } else if (tempLed >= 6 && tempLed <= 10) {
-    color = strip.Color(255, 255, 0); // Gul
-  } else if (tempLed >= 11 && tempLed <= 20) {
-    color = strip.Color(153, 255, 0); // Orange
-  } else if (tempLed >= 21 && tempLed <= 60) {
-    color = strip.Color(0, 255, 0); // Röd
-  }
-
-  for (int i = 0; i < NUM_LEDS; i++) {
-    strip.setPixelColor(i, color);
-  }
-  strip.show();
-}
-
-// Function to play the song once
-void playSong() {
-  for (int i = 0; i < sizeof(notes) / sizeof(notes[0]); i++) {
-    tone(buzzerPin, notes[i], durations[i] * 60000 / tempo);
-    delay(durations[i] * 60000 / tempo);
-  }
-
-  songPlayed = true; // Set the flag indicating the song has been played
-  lastSongPlayTime = millis(); // Record the time the song was played
+    // Handle HTTP server requests
+    server.handleClient();
 }

@@ -1,15 +1,15 @@
 # Whamageddonlampan
 
-En 3D-printad lampa som ändrar färg beroende på yttertemperatur OCH börjar blinka om Last Christmas med Wham spelas på Mix Megapol. Nu i nya versionen har jag även adderat en passiv buzzer som spelar några toner av Last Christmas för ökad uppmärksamhet.
+En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Jag har även adderat en passiv buzzer som vackert spelar några toner av Last Christmas för ökad uppmärksamhet. 
 
 Flasha filen whamageddonlampan.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
 
 Lampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
 Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet (på engelska)
-Lampan kollar även spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. 
+Lampan kollar även spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. En buzzer som kan spela olika noter krämar dessutom ur sig några välkända noter. Oljudet hörs dock bara en gång per spelning av låten. Blinkandet pågår tills låten är slut.  
 
-Här är en video som visar hur det funkar: https://youtu.be/staYxQRvpsY
+Här är en video som visar hur det funkar (utan buzzern) : https://youtu.be/staYxQRvpsY
 
 Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode.
 Lådan finns att printa i två olika versioner och STEP/STL-filer finns att ladda ner.  Välj om du vill ha versionen med eller utan fästen för M 2.5 skruvar. Den med skruv är bättre, men har du inga M 2.5 liggandes så funkar versionen utan skruv om du säkrar Wemosen med smältlim. 
@@ -23,7 +23,7 @@ De komponenter som behövs är:
 - WS2812 LED https://www.aliexpress.com/item/1005001863273661.html
 - WS2812 LED (alternativ i Sverige) https://www.electrokit.com/produkt/led-rgb-5mm-adresserbar-ws2812-diffus-5-pack/
 - 100 ohm motstånd
-- Passiv Buzzer (som spelar Last Christmas) https://www.aliexpress.com/item/1005006213298069.html
+- Passiv Buzzer https://www.aliexpress.com/item/1005006213298069.html
 - Metallsugrör https://www.amazon.se/Alfresco-metallsugr%C3%B6r-%C3%A5teranv%C3%A4ndbara-reng%C3%B6ringsborstar-cocktail/dp/B0BKT4334T/ref=sr_1_17
 - Dupontsladdar
 - Smältlim för att få LEDen på plats i stjärnan

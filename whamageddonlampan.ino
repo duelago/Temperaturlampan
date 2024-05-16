@@ -127,7 +127,7 @@ void handleJsonObject(JsonObject obj) {
     Serial.println(songTitle);
 
     // If the song title is "Last Christmas", start blinking the LED
-    if (songTitle == "Unforgettable") {
+    if (songTitle == "Last Christmas") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
@@ -245,7 +245,7 @@ void handleRoot() {
     html += "<p>Låt just nu: ";
     html += songTitle;
     html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
-    html += "Version 0.5 Whamageddonlampan<br>";
+    html += "Version 0.6 Whamageddonlampan<br>";
     html += "</div>";
     html += "</body></html>";
 
@@ -389,7 +389,7 @@ void loop() {
                 handleJsonObject(doc.as<JsonObject>());
 
                 // Check if the song title is set to true and call the song function
-                if (songTitle == "Unforgettable") {
+                if (songTitle == "Last Christmas") {
                     Serial.println("Playing song...");
                     song(14); // Change pin number if needed
                 }

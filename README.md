@@ -34,7 +34,9 @@ De komponenter som behövs är:
 <h1>Kopplingsschema</h1>
 
 
-![skiss](https://github.com/duelago/Temperaturlampan/assets/12539239/a163f34b-9bc2-4a24-a90c-1ac9b98ec7bc)
+![templampan](https://github.com/duelago/Temperaturlampan/assets/12539239/ebb60627-cd37-4e9d-8fff-efc2866f2104)
+![templampan](https://github.com/duelago/Temperaturlampan/assets/12539239/ebb60627-cd37-4e9d-8fff-efc2866f2104)
+
 
 
 

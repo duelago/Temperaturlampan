@@ -23,6 +23,7 @@ De komponenter som behövs är:
 - WS2812 LED https://www.aliexpress.com/item/1005001863273661.html
 - WS2812 LED (alternativ i Sverige) https://www.electrokit.com/produkt/led-rgb-5mm-adresserbar-ws2812-diffus-5-pack/
 - 100 ohm motstånd
+- Passiv Buzzer (som spelar Last Christmas) https://www.aliexpress.com/item/1005006213298069.html
 - Metallsugrör https://www.amazon.se/Alfresco-metallsugr%C3%B6r-%C3%A5teranv%C3%A4ndbara-reng%C3%B6ringsborstar-cocktail/dp/B0BKT4334T/ref=sr_1_17
 - Dupontsladdar
 - Smältlim för att få LEDen på plats i stjärnan

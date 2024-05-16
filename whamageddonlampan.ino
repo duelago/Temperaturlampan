@@ -36,6 +36,7 @@ const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme"
 
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking
+bool songPlayed = false; // Flag to track if the song has been played
 
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
@@ -127,7 +128,7 @@ void handleJsonObject(JsonObject obj) {
     Serial.println(songTitle);
 
     // If the song title is "Last Christmas", start blinking the LED
-    if (songTitle == "Last Christmas") {
+    if (songTitle == "Unforgettable") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
@@ -245,7 +246,7 @@ void handleRoot() {
     html += "<p>Låt just nu: ";
     html += songTitle;
     html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
-    html += "Version 0.6 Whamageddonlampan<br>";
+    html += "Version 0.5 Whamageddonlampan<br>";
     html += "</div>";
     html += "</body></html>";
 
@@ -389,9 +390,10 @@ void loop() {
                 handleJsonObject(doc.as<JsonObject>());
 
                 // Check if the song title is set to true and call the song function
-                if (songTitle == "Last Christmas") {
+                if (songTitle == "Unforgettable" && !songPlayed) {
                     Serial.println("Playing song...");
                     song(14); // Change pin number if needed
+                    songPlayed = true; // Set the flag to true after playing the song
                 }
             } else {
                 Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -424,6 +426,14 @@ void loop() {
                 strip.show();
             }
         }
+    }
+
+    // Check if one hour has passed since the song was played
+    const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
+    static unsigned long lastFalseTime = 0;
+
+    if (songPlayed && currentMillis - lastFalseTime >= cooldownPeriod) {
+        songPlayed = false; // Reset the flag to false after one hour
     }
 
     // Handle HTTP server requests

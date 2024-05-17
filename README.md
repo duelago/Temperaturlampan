@@ -6,8 +6,8 @@ Kompilera filen whamageddonlamp.ino  i Arduino IDE eller så laddar du ner .bin-
 
 Lampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 
-Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet (på engelska)
-Lampan kollar även spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. En buzzer som kan spela olika noter krämar dessutom ur sig några välkända noter. Oljudet hörs dock bara en gång per spelning av låten. Blinkandet pågår tills låten är slut.  
+Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet.
+Lampan kollar spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. En buzzer krämar dessutom ur sig några välkända noter. Oljudet hörs dock bara en gång per spelning av låten. Blinkandet pågår tills låten är slut.  
 
 Här är en video som visar hur det funkar (utan buzzern) : https://youtu.be/staYxQRvpsY
 
@@ -63,9 +63,9 @@ Jag printar mina lådor och lock i PLA med 0.6 nozzle och 0.3 mm lagerhöjd. Sj�
 
 I övrigt är det bara att titta på kopplingsschemat och löda kablarna på plats och vara uppmärksam på vilka ben på LEDen som ska kopplas var. Jag använder lite smältlim för att få LEDen på plats i själva stjärnan. Glöm inte krympslang för att separera de tre kontaktytorna till LEDen. I julversionen limmar jag ihop de två delarna av stjärnan med superlim och med "tulpanen" limmar jag den lilla adaptern med superlim.
 
-Användaren ansluter enheten med en vanlig microusb-kabel och mobilladdare. Första gången man ansluter lampan i hemmet dyker en ny accesspunkt upp som heter <b>Temperaturlampan</b> Anslut till denna via den captive portal som poppar upp, eller via IP-adress: http://192.168.4.1
+Användaren ansluter enheten med en vanlig microusb-kabel och mobilladdare. Första gången man ansluter lampan i hemmet dyker en ny accesspunkt upp som heter <b>Whamageddonlamp</b> Anslut till denna via den captive portal som poppar upp, eller via IP-adress: http://192.168.4.1
 
-Lampan får nu en IP-adress av DHCP-servern i hemmet. Användaren ansluter sin dator eller telefon till sitt hemmawifi igen och når nu lampan via denna nya IP-adress eller på adressen: http://whamageddonlampan.local
+Lampan får nu en IP-adress av DHCP-servern i hemmet. Användaren ansluter sin dator eller telefon till sitt hemmawifi igen och når nu lampan via denna nya IP-adress eller på adressen: http://whamageddonlamp.local Funkar inte det så använd appen Fing eller liknande på din telefon för att lista ut vilken IP-adress lampan har fått. 
 
 I webbinterfacet ställer man in flygplats. Denna sparas i EEPROM och klarar alltså strömavbrott etc. 
 

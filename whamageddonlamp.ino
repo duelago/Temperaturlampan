@@ -128,12 +128,12 @@ void handleJsonObject(JsonObject obj) {
     Serial.println(songTitle);
 
     // If the song title is "Last Christmas", start blinking the LED
-    if (songTitle == "Unforgettable") {
+    if (songTitle == "Last Christmas") {
         Serial.println("Whamageddon!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
     } else {
-        // Turn off the LED if the song title is not "X"
+        // Turn off the LED if the song title is not "Last Christmas"
         Serial.println("Song is not Last Christmas. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
@@ -196,10 +196,10 @@ void handleRoot() {
     html += ".metar-info { font-size: 18px; margin-top: 20px; }";
     html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
     html += "</style></head><body>";
-    html += "<div class='container'><h1>METAR-kod:</h1>";
+    html += "<div class='container'><h1>METAR-code:</h1>";
     html += "<div class='input-group'><form method='post' action='/submit'>";
     html += "<input type='text' name='stationCode' placeholder='ESSB' />";
-    html += "<input type='submit' value='Skicka' />";
+    html += "<input type='submit' value='Submit' />";
     html += "</form>";
     html += "<p>ESGG GöTEBORG/Landvetter<br>";
     html += "ESOK KARLSTAD<br>";
@@ -241,12 +241,12 @@ void handleRoot() {
     html += "ESNO Örnsköldsvik/Gideå<br>";
     html += "ESNZ Östersund/Frösön (F4)";
     html += "</div>";
-    html += "<div class='metar-info'>Senaste METAR:<br>";
+    html += "<div class='metar-info'>Current METAR:<br>";
     html += METAR;
-    html += "<p>Låt just nu: ";
+    html += "<p>Song right now on Mix Megapol: ";
     html += songTitle;
-    html += "<p><a href='/update'>Firmwareuppdatering</a></p><br>";
-    html += "Version 0.5 Whamageddonlampan<br>";
+    html += "<p><a href='/update'>Firmware update</a></p><br>";
+    html += "Version 0.6 Whamageddonlamp<br>";
     html += "</div>";
     html += "</body></html>";
 
@@ -272,7 +272,7 @@ void handleSubmit() {
     // Fetch METAR data immediately after station code submission
     fetchMETARData();
 
-    server.send(200, "text/html", "Stationen uppdaterad. <a href='/'>Tillbaka</a>");
+    server.send(200, "text/html", "Stationen uppdated. <a href='/'>Back</a>");
 }
 
 void fetchMETARData() {
@@ -327,7 +327,7 @@ void setup() {
     delay(2000);
     display.clearDisplay();
     Serial.begin(115200);
-    MDNS.begin("whamageddonlampan");
+    MDNS.begin("whamageddonlamp");
     ElegantOTA.begin(&server);
 
     // Initialize NeoPixel strip
@@ -336,7 +336,7 @@ void setup() {
 
     // Use WiFiManager to set WiFi credentials if they are not already configured
     WiFiManager wifiManager;
-    wifiManager.autoConnect("Temperaturlampan");
+    wifiManager.autoConnect("Whamageddonlamp");
 
     // Load METAR station code from EEPROM
     EEPROM.begin(EEPROM_SIZE);
@@ -390,7 +390,7 @@ void loop() {
                 handleJsonObject(doc.as<JsonObject>());
 
                 // Check if the song title is set to true and call the song function
-                if (songTitle == "Unforgettable" && !songPlayed) {
+                if (songTitle == "Last Christmas" && !songPlayed) {
                     Serial.println("Playing song...");
                     song(14); // Change pin number if needed
                     songPlayed = true; // Set the flag to true after playing the song
@@ -439,4 +439,3 @@ void loop() {
     // Handle HTTP server requests
     server.handleClient();
 }
-

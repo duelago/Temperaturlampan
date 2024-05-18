@@ -1,6 +1,6 @@
 # Whamageddonlamp
 
-<b>EDIT:</> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på SM i Bangolf 2012 i Kalmar och när den spelas på Mix Megapol
+<b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på SM i Bangolf 2012 i Kalmar och när den spelas på Mix Megapol
 
 En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Lampan spelar även några toner av Last Christmas med hjälp av en störig buzzer. 
 

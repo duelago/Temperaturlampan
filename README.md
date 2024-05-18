@@ -1,5 +1,7 @@
 # Whamageddonlamp
 
+EDIT: Nu även i sommarversion. Kompilera filen bangolf.ino om ni vill ha koll på SM i Bangolf 2012 i Kalmar och när den spelas på Mix Megapol
+
 En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Lampan spelar även några toner av Last Christmas med hjälp av en störig buzzer. 
 
 Kompilera filen whamageddonlamp.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher

@@ -1,4 +1,4 @@
-# Whamageddonlamp
+# Whamageddonlampan
 
 <b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på [SM i Bangolf 2012 i Kalmar](https://open.spotify.com/track/16TkRIy5gUXIdXDh36Aj95) och när den spelas på Mix Megapol
 

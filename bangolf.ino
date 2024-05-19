@@ -192,21 +192,26 @@ void song(int buzzerPin){
   noTone(buzzerPin);
 
   tone(buzzerPin, 220);
-  delay(875);
+  delay(500);
   noTone(buzzerPin);
 
-  tone(buzzerPin, 330);
+  tone(buzzerPin, 220);
   delay(375);
   noTone(buzzerPin);
 
-  tone(buzzerPin, 330);
+  tone(buzzerPin, 277);
   delay(375);
   noTone(buzzerPin);
 
-  tone(buzzerPin, 330);
+  tone(buzzerPin, 247);
+  delay(375);
+  noTone(buzzerPin);
+
+  tone(buzzerPin, 247);
   delay(375);
   noTone(buzzerPin);
 }
+
 
 // Callback function to handle the JSON object
 void handleJsonObject(JsonObject obj) {

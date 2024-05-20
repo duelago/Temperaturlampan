@@ -12,6 +12,7 @@
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
 #include <ElegantOTA.h>
+#define EEPROM_SIZE    100
 
 #define OLED_RESET 0
 
@@ -26,8 +27,11 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800)
 ESP8266WebServer server(80);
 
 char METARStation[5];
+char storedSongTitle[EEPROM_SIZE - 5];
 String METAR; // Declare METAR as a global variable
 String songTitle; // Declare songTitle as a global variable
+String currentSongTitle; // Declare currentSongTitle as a global variable
+
 
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
@@ -40,6 +44,9 @@ bool songPlayed = false; // Flag to track if the song has been played
 
 unsigned long lastBlinkTime = 0;
 const unsigned long blinkInterval = 500; // Blink interval in milliseconds
+
+const unsigned long METAR_FETCH_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
+unsigned long lastMETARFetchTime = 0;
 
 void song(int buzzerPin){
   
@@ -215,22 +222,22 @@ void song(int buzzerPin){
 
 void handleJsonObject(JsonObject obj) {
     const char* trackTitle = obj["TrackTitle"];
-    songTitle = trackTitle;
+    currentSongTitle = trackTitle;
     Serial.print("Received Track Title: ");
-    Serial.println(songTitle);
+    Serial.println(currentSongTitle);
 
-    String storedSongTitle = readSongTitleFromEEPROM();
-    if (songTitle == storedSongTitle) {
-        Serial.println("Matched song! Setting blinkLED flag to true.");
+    if (currentSongTitle == storedSongTitle) {
+        Serial.println("Stored song is playing!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
     } else {
-        Serial.println("Song did not match. Keeping blinkLED flag false.");
+        Serial.println("Different song is playing. Keeping blinkLED flag false.");
         blinkLED = false;
         isBlinking = false; // Set isBlinking to false if not blinking
         setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
     }
 }
+
 
 String parseTemperature(const String& metar) {
     // Find the position of "Temperature: " in the METAR string
@@ -287,15 +294,53 @@ void handleRoot() {
     html += ".metar-info { font-size: 18px; margin-top: 20px; }";
     html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
     html += "</style></head><body>";
-    html += "<div class='container'><h1>Set METAR Station Code and Song Title:</h1>";
+    html += "<div class='container'><h1>Set METAR Code and Song Title:</h1>";
     html += "<div class='input-group'><form method='post' action='/submit'>";
-    html += "<input type='text' name='stationCode' placeholder='ESSB' />";
-    html += "<input type='submit' value='Submit' />";
-    html += "</form></div>";
-    html += "<div class='input-group'><form method='post' action='/submitSong'>";
+    html += "<input type='text' name='stationCode' placeholder='METAR Station Code' />";
     html += "<input type='text' name='songTitle' placeholder='Song Title' />";
     html += "<input type='submit' value='Submit' />";
-    html += "</form></div>";
+    html += "</form>";
+    html += "<p>";
+    html += "<p>ESGG GöTEBORG/Landvetter<br>";
+    html += "ESOK KARLSTAD<br>";
+    html += "ESNQ KIRUNA<br>";
+    html += "ESMS MALMö<br>";
+    html += "ESSA STOCKHOLM/Arlanda<br>";
+    html += "ESSB STOCKHOLM/Bromma<br>";
+    html += "ESKN STOCKHOLM/Skavsta<br>";
+    html += "ESOW STOCKHOLM/Västerås<br>";
+    html += "<p>";
+    html += "ESNX Arvidsjaur<br>";
+    html += "ESSD Borlänge<br>";
+    html += "ESNG Gällivare<br>";
+    html += "ESMT Halmstad (F14)<br>";
+    html += "ESUT Hemavan<br>";
+    html += "ESGJ Jönköping<br>";
+    html += "ESMQ Kalmar (F12)<br>";
+    html += "ESNK Kramfors/Sollefteå<br>";
+    html += "ESMK Kristianstad/Everöd<br>";
+    html += "ESCF Linköping/Malmen (F3)<br>";
+    html += "ESTL Ljungbyhed (F5)<br>";
+    html += "ESPA Luleå (F21)<br>";
+    html += "ESNL Lycksele<br>";
+    html += "ESSP Norrköping/Kungsängen<br>";
+    html += "ESUP Pajala<br>";
+    html += "ESDF Ronneby (F17)<br>";
+    html += "ESNS Skellefteå<br>";
+    html += "ESGR Skövde<br>";
+    html += "ESNN Sundsvall-Timrå<br>";
+    html += "ESIB Såtenäs (F7)<br>";
+    html += "ESKS Sälen<br>";
+    html += "ESGT Trollhättan-Vänersborg<br>";
+    html += "ESNU Umeå<br>";
+    html += "ESNV Vilhelmina<br>";
+    html += "ESSV Visby<br>";
+    html += "ESMX Växjö/Kronoberg<br>";
+    html += "ESTA Ängelholm/Barkåkra (F10)<br>";
+    html += "ESOE Örebro<br>";
+    html += "ESNO Örnsköldsvik/Gideå<br>";
+    html += "ESNZ Östersund/Frösön (F4)";
+    html += "</div>";
     html += "<div class='metar-info'>Current METAR:<br>";
     html += METAR;
     html += "<p>Song right now on Mix Megapol: ";
@@ -308,44 +353,36 @@ void handleRoot() {
     server.send(200, "text/html", html);
 }
 
+
 void handleSubmit() {
     String stationCode = server.arg("stationCode");
+    String songTitle = server.arg("songTitle");
+
+    // Convert the input station code to uppercase
     stationCode.toUpperCase();
+
+    // Copy the uppercase station code to METARStation variable
     stationCode.toCharArray(METARStation, 5);
 
+    // Copy the song title to storedSongTitle variable
+    songTitle.toCharArray(storedSongTitle, EEPROM_SIZE - 5);
+
+    // Update EEPROM with the new METAR station code and song title
     EEPROM.begin(EEPROM_SIZE);
     for (int i = 0; i < 5; ++i) {
         EEPROM.write(i, METARStation[i]);
     }
+    for (int i = 0; i < EEPROM_SIZE - 5; ++i) {
+        EEPROM.write(i + 5, storedSongTitle[i]);
+    }
     EEPROM.end();
 
+    // Fetch METAR data immediately after station code submission
     fetchMETARData();
-    server.send(200, "text/html", "Station updated. <a href='/'>Back</a>");
+
+    server.send(200, "text/html", "Settings updated. <a href='/'>Back</a>");
 }
 
-void handleSubmitSong() {
-    String newSongTitle = server.arg("songTitle");
-    EEPROM.begin(EEPROM_SIZE);
-    for (int i = 0; i < newSongTitle.length() && i < EEPROM_SIZE - 5; ++i) {
-        EEPROM.write(5 + i, newSongTitle[i]);
-    }
-    EEPROM.write(5 + newSongTitle.length(), '\0'); // Null-terminate the stored string
-    EEPROM.end();
-
-    server.send(200, "text/html", "Song title updated. <a href='/'>Back</a>");
-}
-
-String readSongTitleFromEEPROM() {
-    String storedSongTitle = "";
-    EEPROM.begin(EEPROM_SIZE);
-    for (int i = 5; i < EEPROM_SIZE; ++i) {
-        char c = EEPROM.read(i);
-        if (c == '\0') break;
-        storedSongTitle += c;
-    }
-    EEPROM.end();
-    return storedSongTitle;
-}
 
 void fetchMETARData() {
     // Fetch METAR data using METARStation variable (e.g., "ESSA" or user-defined value)
@@ -402,78 +439,100 @@ void setup() {
     MDNS.begin("whamageddonlamp");
     ElegantOTA.begin(&server);
 
+    // Initialize NeoPixel strip
     strip.begin();
     strip.show();  // Initialize all pixels to 'off'
 
+    // Use WiFiManager to set WiFi credentials if they are not already configured
     WiFiManager wifiManager;
     wifiManager.autoConnect("Whamageddonlamp");
 
+    // Load METAR station code and song title from EEPROM
     EEPROM.begin(EEPROM_SIZE);
     for (int i = 0; i < 5; ++i) {
         METARStation[i] = EEPROM.read(i);
     }
+    for (int i = 0; i < EEPROM_SIZE - 5; ++i) {
+        storedSongTitle[i] = EEPROM.read(i + 5);
+    }
     EEPROM.end();
-    METARStation[4] = '\0';
 
-    songTitle = readSongTitleFromEEPROM();
-
-    server.on("/", handleRoot);
-    server.on("/submit", HTTP_POST, handleSubmit);
-    server.on("/submitSong", HTTP_POST, handleSubmitSong);
-
-    server.on("/update", []() {
-        server.sendHeader("Connection", "close");
-        server.send(200, "text/html", "<meta http-equiv='refresh' content='5;url=/'><body><h1>Updating...</h1></body>");
-        ESP.restart();
-    });
-
-    server.begin();
-
+    // Fetch METAR data as soon as possible after boot
     fetchMETARData();
 
-    Serial.println("Setup complete.");
+    // Start web server
+    server.on("/", HTTP_GET, handleRoot);
+    server.on("/submit", HTTP_POST, handleSubmit);
+    server.begin();
 }
 
 
 void loop() {
-    server.handleClient();
-  
-
     unsigned long currentMillis = millis();
 
-    if (currentMillis - previousMillis >= REBOOT_INTERVAL) {
-        Serial.println("Rebooting device to prevent memory leaks.");
-        ESP.restart();
+    // Check song title every 30 seconds
+    static unsigned long lastCheckTime = 0;
+    const unsigned long checkInterval = 30000;  // 30 seconds in milliseconds
+
+    if (currentMillis - lastCheckTime >= checkInterval) {
+        lastCheckTime = currentMillis;
+
+        if (WiFi.status() == WL_CONNECTED) {
+            WiFiClientSecure client;
+            client.setInsecure(); // Ignore SSL certificate verification
+
+            HTTPClient https;
+            https.begin(client, apiUrl);
+
+            int httpCode = https.GET();
+
+            if (httpCode == HTTP_CODE_OK) {
+                String payload = https.getString();
+                DynamicJsonDocument doc(1024);
+                DeserializationError error = deserializeJson(doc, payload);
+
+                if (!error) {
+                    JsonObject obj = doc.as<JsonObject>();
+                    handleJsonObject(obj);
+                } else {
+                    Serial.println("Failed to parse JSON");
+                }
+            } else {
+                Serial.printf("GET request failed with code: %d\n", httpCode);
+            }
+        }
     }
 
-    if (blinkLED && !isBlinking) {
-        isBlinking = true;
-        lastBlinkTime = millis();
-        Serial.println("Starting LED blinking...");
+    // Fetch METAR data every 30 minutes
+    if (currentMillis - lastMETARFetchTime >= METAR_FETCH_INTERVAL) {
+        lastMETARFetchTime = currentMillis;
+        fetchMETARData();
     }
 
-    if (isBlinking && blinkLED) {
-        if (millis() - lastBlinkTime >= blinkInterval) {
-            uint32_t color = strip.getPixelColor(0);
+    // Handle LED blinking if the flag is set
+    if (blinkLED) {
+        unsigned long currentBlinkTime = millis();
+        if (currentBlinkTime - lastBlinkTime >= blinkInterval) {
+            lastBlinkTime = currentBlinkTime;
 
-            if (color == 0) {
-                strip.setPixelColor(0, 255, 0, 0);
-                strip.setBrightness(LED_BRIGHTNESS);
+            // Toggle LED state
+            if (isBlinking) {
+                strip.setPixelColor(0, strip.Color(255, 0, 0));  // Set LED to red
                 strip.show();
             } else {
-                strip.setPixelColor(0, 0, 0, 0);
+                strip.setPixelColor(0, strip.Color(0, 0, 0));  // Turn off LED
                 strip.show();
             }
-            lastBlinkTime = millis();
-        }
-    } else {
-        if (isBlinking) {
-            isBlinking = false;
-            strip.setPixelColor(0, 0, 0, 0);
-            strip.show();
-            Serial.println("Stopping LED blinking...");
+
+            isBlinking = !isBlinking;  // Toggle the isBlinking state
         }
     }
 
-    MDNS.update();
+    server.handleClient();
+
+    // Check if it's time to reboot the ESP8266
+    if (currentMillis - previousMillis >= REBOOT_INTERVAL) {
+        previousMillis = currentMillis;
+        ESP.restart();
+    }
 }

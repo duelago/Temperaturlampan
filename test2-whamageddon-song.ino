@@ -344,7 +344,7 @@ void handleRoot() {
     html += "<div class='metar-info'>Current METAR:<br>";
     html += METAR;
     html += "<p>Song right now on Mix Megapol: ";
-    html += songTitle;
+    html += currentSongTitle;
     html += "<p><a href='/update'>Firmware update</a></p><br>";
     html += "Version 0.6 Whamageddonlamp<br>";
     html += "</div>";

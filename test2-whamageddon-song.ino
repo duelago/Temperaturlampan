@@ -488,18 +488,30 @@ void loop() {
 
             if (httpCode == HTTP_CODE_OK) {
                 String payload = https.getString();
-                DynamicJsonDocument doc(1024);
+                https.end();
+
+                StaticJsonDocument<1200> doc;
                 DeserializationError error = deserializeJson(doc, payload);
 
-                if (!error) {
-                    JsonObject obj = doc.as<JsonObject>();
-                    handleJsonObject(obj);
-                } else {
-                    Serial.println("Failed to parse JSON");
+                if (error) {
+                    Serial.print(F("deserializeJson() failed: "));
+                    Serial.println(error.f_str());
+                    return;
+                }
+
+                handleJsonObject(doc.as<JsonObject>());
+
+                // Check if the song title is set to true and call the song function
+                if (songTitle == "SM i Bangolf 2012 i Kalmar" && !songPlayed) {
+                    Serial.println("Playing song...");
+                    song(14); // Change pin number if needed
+                    songPlayed = true; // Set the flag to true after playing the song
                 }
             } else {
-                Serial.printf("GET request failed with code: %d\n", httpCode);
+                Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
             }
+        } else {
+            Serial.println("WiFi Disconnected. Skipping song check.");
         }
     }
 

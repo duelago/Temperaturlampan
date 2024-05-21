@@ -545,12 +545,20 @@ void loop() {
                 strip.setPixelColor(0, strip.Color(255, 0, 0));  // Set LED to red
                 strip.show();
             } else {
-                strip.setPixelColor(0, strip.Color(0, 0, 0));  // Turn off LED
+                strip.setPixelColor(0, strip.Color(0, 255, 0));  // Green
                 strip.show();
             }
 
             isBlinking = !isBlinking;  // Toggle the isBlinking state
         }
+    }
+    
+    // Check if one hour has passed since the song was played
+    const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
+    static unsigned long lastFalseTime = 0;
+
+    if (songPlayed && currentMillis - lastFalseTime >= cooldownPeriod) {
+        songPlayed = false; // Reset the flag to false after one hour
     }
 
     server.handleClient();

@@ -237,6 +237,20 @@ void handleJsonObject(JsonObject obj) {
         Serial.println("Stored song is playing!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
+
+        // Add cooldown period check
+        const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
+        unsigned long currentMillis = millis();
+        unsigned long timeSincePlayed = currentMillis - songPlayedTime;
+
+        if (!songPlayed && timeSincePlayed >= cooldownPeriod) {
+            Serial.println("Playing song...");
+            song(14); // Change pin number if needed
+            songPlayed = true; // Set the flag to true after playing the song
+            songPlayedTime = currentMillis; // Update songPlayedTime
+        } else {
+            Serial.println("Song recently played, within cooldown period.");
+        }
     } else {
         Serial.println("Different song is playing. Keeping blinkLED flag false.");
         blinkLED = false;
@@ -508,31 +522,15 @@ void loop() {
                     return;
                 }
 
-       handleJsonObject(doc.as<JsonObject>());
+                handleJsonObject(doc.as<JsonObject>());
 
-        // Check if the song title is set to true and call the song function
-        Serial.print("Comparing song titles: ");
-        Serial.print("currentSongTitle = ");
-        Serial.print(currentSongTitle);
-        Serial.print(", storedSongTitle = ");
-        Serial.println(storedSongTitle);
-
-        // Add cooldown period check
-        const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
-        unsigned long timeSincePlayed = currentMillis - songPlayedTime;
-        if (songTitle == currentSongTitle && !songPlayed && timeSincePlayed >= cooldownPeriod) {
-          Serial.println("Playing song...");
-          song(14); // Change pin number if needed
-          songPlayed = true; // Set the flag to true after playing the song
-          songPlayedTime = currentMillis; // Update songPlayedTime
+            } else {
+                Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
+            }
+        } else {
+            Serial.println("WiFi Disconnected. Skipping song check.");
         }
-      } else {
-        Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
-      }
-    } else {
-      Serial.println("WiFi Disconnected. Skipping song check.");
     }
-  }
 
     // Fetch METAR data every 30 minutes
     if (currentMillis - lastMETARFetchTime >= METAR_FETCH_INTERVAL) {
@@ -559,13 +557,12 @@ void loop() {
         }
     }
     
-  // Check if one hour has passed since the song was played (moved outside the WiFi check)
-  const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
-  if (songPlayed && currentMillis - songPlayedTime >= cooldownPeriod) {
-    songPlayed = false; // Reset the flag to false after one hour
-  }
+    // Check if one hour has passed since the song was played
+    if (songPlayed && currentMillis - songPlayedTime >= 3600000) { // 1 hour in milliseconds
+        songPlayed = false; // Reset the flag to false after one hour
+    }
 
-server.handleClient();
+    server.handleClient();
 
     // Check if it's time to reboot the ESP8266
     if (currentMillis - previousMillis >= REBOOT_INTERVAL) {
@@ -573,5 +570,3 @@ server.handleClient();
         ESP.restart();
     }
 }
-
-

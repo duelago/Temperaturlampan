@@ -36,6 +36,9 @@ String currentSongTitle; // Declare currentSongTitle as a global variable
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
 
+// Add a variable to store the time the song was last played
+unsigned long songPlayedTime = 0;
+
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
 
 bool blinkLED = false; // Flag to control LED blinking
@@ -505,28 +508,31 @@ void loop() {
                     return;
                 }
 
-                handleJsonObject(doc.as<JsonObject>());
+       handleJsonObject(doc.as<JsonObject>());
 
-                // Check if the song title is set to true and call the song function
-                Serial.print("Comparing song titles: ");
-                Serial.print("currentSongTitle = ");
-                Serial.print(currentSongTitle);
-                Serial.print(", storedSongTitle = ");
-                Serial.println(storedSongTitle);
+        // Check if the song title is set to true and call the song function
+        Serial.print("Comparing song titles: ");
+        Serial.print("currentSongTitle = ");
+        Serial.print(currentSongTitle);
+        Serial.print(", storedSongTitle = ");
+        Serial.println(storedSongTitle);
 
-                if (songTitle == currentSongTitle && !songPlayed) {
-                    Serial.println("Playing song...");
-                    song(14); // Change pin number if needed
-                    songPlayed = true; // Set the flag to true after playing the song
-                     
-                }
-            } else {
-                Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
-            }
-        } else {
-            Serial.println("WiFi Disconnected. Skipping song check.");
+        // Add cooldown period check
+        const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
+        unsigned long timeSincePlayed = currentMillis - songPlayedTime;
+        if (songTitle == currentSongTitle && !songPlayed && timeSincePlayed >= cooldownPeriod) {
+          Serial.println("Playing song...");
+          song(14); // Change pin number if needed
+          songPlayed = true; // Set the flag to true after playing the song
+          songPlayedTime = currentMillis; // Update songPlayedTime
         }
+      } else {
+        Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());
+      }
+    } else {
+      Serial.println("WiFi Disconnected. Skipping song check.");
     }
+  }
 
     // Fetch METAR data every 30 minutes
     if (currentMillis - lastMETARFetchTime >= METAR_FETCH_INTERVAL) {
@@ -553,15 +559,13 @@ void loop() {
         }
     }
     
-    // Check if one hour has passed since the song was played
-    const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
-    static unsigned long lastFalseTime = 0;
+  // Check if one hour has passed since the song was played (moved outside the WiFi check)
+  const unsigned long cooldownPeriod = 3600000; // 1 hour in milliseconds
+  if (songPlayed && currentMillis - songPlayedTime >= cooldownPeriod) {
+    songPlayed = false; // Reset the flag to false after one hour
+  }
 
-    if (songPlayed && currentMillis - lastFalseTime >= cooldownPeriod) {
-        songPlayed = false; // Reset the flag to false after one hour
-    }
-
-    server.handleClient();
+server.handleClient();
 
     // Check if it's time to reboot the ESP8266
     if (currentMillis - previousMillis >= REBOOT_INTERVAL) {
@@ -569,3 +573,5 @@ void loop() {
         ESP.restart();
     }
 }
+
+

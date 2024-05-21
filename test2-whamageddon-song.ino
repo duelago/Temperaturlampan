@@ -50,6 +50,8 @@ unsigned long lastMETARFetchTime = 0;
 
 void song(int buzzerPin){
   
+  Serial.println("Starting song function");
+  
   tone(buzzerPin, 330);
   delay(266);
   noTone(buzzerPin);
@@ -217,6 +219,8 @@ void song(int buzzerPin){
   tone(buzzerPin, 247);
   delay(375);
   noTone(buzzerPin);
+
+  Serial.println("Finished song function");
 }
 
 
@@ -345,8 +349,10 @@ void handleRoot() {
     html += METAR;
     html += "<p>Song right now on Mix Megapol: ";
     html += currentSongTitle;
+    html += "<p>Stored song title: ";
+    html += storedSongTitle;
     html += "<p><a href='/update'>Firmware update</a></p><br>";
-    html += "Version 0.6 Whamageddonlamp<br>";
+    html += "Version 0.7 Whamageddonlamp<br>";
     html += "</div>";
     html += "</body></html>";
 
@@ -502,10 +508,17 @@ void loop() {
                 handleJsonObject(doc.as<JsonObject>());
 
                 // Check if the song title is set to true and call the song function
-                if (songTitle == "SM i Bangolf 2012 i Kalmar" && !songPlayed) {
+                Serial.print("Comparing song titles: ");
+                Serial.print("currentSongTitle = ");
+                Serial.print(currentSongTitle);
+                Serial.print(", storedSongTitle = ");
+                Serial.println(storedSongTitle);
+
+                if (songTitle == currentSongTitle && !songPlayed) {
                     Serial.println("Playing song...");
                     song(14); // Change pin number if needed
                     songPlayed = true; // Set the flag to true after playing the song
+                     
                 }
             } else {
                 Serial.printf("[HTTP] GET request failed, error: %s\n", https.errorToString(httpCode).c_str());

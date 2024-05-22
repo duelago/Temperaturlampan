@@ -1,8 +1,8 @@
 # Whamageddonlampan
 
-<b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på [SM i Bangolf 2012 i Kalmar](https://open.spotify.com/track/16TkRIy5gUXIdXDh36Aj95) och när den spelas på Mix Megapol
+<b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på [SM i Bangolf 2012 i Kalmar](https://open.spotify.com/track/16TkRIy5gUXIdXDh36Aj95) När låten matchar på Mix Megapol så spelas en välkänd truddelutt av lampan.
 
-En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Lampan spelar även några toner av Last Christmas med hjälp av en störig buzzer. 
+En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Det går även att bevaka andra låtar, du ställer själv in låt i webbinterfacet. Lampan spelar även några toner av Last Christmas med hjälp av en störig buzzer vid träff. 
 
 Kompilera filen whamageddonlamp.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
 
@@ -69,7 +69,7 @@ Användaren ansluter enheten med en vanlig microusb-kabel och mobilladdare. För
 
 Lampan får nu en IP-adress av DHCP-servern i hemmet. Användaren ansluter sin dator eller telefon till sitt hemmawifi igen och når nu lampan via denna nya IP-adress eller på adressen: http://whamageddonlamp.local Funkar inte det så använd appen Fing eller liknande på din telefon för att lista ut vilken IP-adress lampan har fått. 
 
-I webbinterfacet ställer man in flygplats. Denna sparas i EEPROM och klarar alltså strömavbrott etc. 
+I webbinterfacet ställer man in flygplats och låt man vill bevaka. Dessa sparas i EEPROM och klarar alltså strömavbrott etc. 
 
 
 ![Screenshot 2024-05-22 at 08 39 23](https://github.com/duelago/Temperaturlampan/assets/12539239/358260d7-782f-43a1-8a2a-4314bc805bc0)

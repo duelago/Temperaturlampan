@@ -71,7 +71,8 @@ Lampan får nu en IP-adress av DHCP-servern i hemmet. Användaren ansluter sin d
 
 I webbinterfacet ställer man in flygplats. Denna sparas i EEPROM och klarar alltså strömavbrott etc. 
 
-![Screenshot 2024-05-18 at 18 53 23](https://github.com/duelago/Temperaturlampan/assets/12539239/a2d9965f-d25b-45d3-b8c9-df7a9606869d)
+![Screenshot 2024-05-22 at 08 33 07](https://github.com/duelago/Temperaturlampan/assets/12539239/270d16ab-c650-42b1-b056-0de099b7f21e)
+
 
 
 ![ezgif com-crop](https://github.com/duelago/Temperaturlampan/assets/12539239/41c63c9f-87a0-4780-b7ca-e82fb4401fc8)

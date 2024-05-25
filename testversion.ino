@@ -32,7 +32,7 @@ char storedSongTitle[EEPROM_SIZE - 5];
 String METAR; // Declare METAR as a global variable
 String songTitle; // Declare songTitle as a global variable
 String currentSongTitle; // Declare currentSongTitle as a global variable
-
+String buzzerSound;
 
 const unsigned long REBOOT_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 unsigned long previousMillis = 0;
@@ -523,7 +523,10 @@ void handleRoot() {
     html += "<div class='input-group'><form method='post' action='/submit'>";
     html += "<input type='text' name='stationCode' placeholder='METAR Station Code' />";
     html += "<input type='text' name='songTitle' placeholder='Song Title' />";
-    html += "<div class='input-group'><label for='buzzerSound'>Select Buzzer Sound:</label>";
+    html += "<p>";
+    html += "<p>";
+    html += "<div class='input-group'><label for='buzzerSound'>Buzzer Sound:</label>";
+    html += "<p>";
     html += "<select name='buzzerSound' id='buzzerSound'>";
     html += "<option value='0'>SM i Bangolf 2012 i Kalmar</option>";
     html += "<option value='1'>Never gonna give you up</option>";
@@ -577,7 +580,9 @@ void handleRoot() {
     html += "<p>Song right now on Mix Megapol: ";
     html += currentSongTitle;
     html += "<p>Stored song title: ";
-    html += storedSongTitle;
+    html += storedSongTitle; 
+    html += "<p>Stored buzzer sound: ";
+    html += buzzerSound;
     html += "<p><a href='/update'>Firmware update</a></p><br>";
     html += "Version 0.7 Whamageddonlamp<br>";
     html += "</div>";

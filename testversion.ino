@@ -12,8 +12,8 @@
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
 #include <ElegantOTA.h>
-
 #define EEPROM_SIZE    100
+
 #define OLED_RESET 0
 
 Adafruit_SSD1306 display(OLED_RESET);
@@ -21,6 +21,8 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define PIN            D4  // Define the pin for WS2811 LEDs
 #define NUM_LEDS       1   // Define the number of LEDs
 #define LED_BRIGHTNESS 255  // Define LED brightness (0-255)
+#define EEPROM_SIZE    100   // Size of EEPROM for storing METAR station code (max 4 characters + null terminator)
+#define BUZZER_PIN D5
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 ESP8266WebServer server(80);
@@ -51,614 +53,391 @@ const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 const unsigned long METAR_FETCH_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
 unsigned long lastMETARFetchTime = 0;
 
-void songChristmas(int buzzerPin);
-void songGolf(int buzzerPin);
-void songRickroll(int buzzerPin);
-void playSelectedSong(int buzzerPin);
+void song1(int buzzerPin) {
+    // Song 1 notes
+    tone(BUZZER_PIN, 330);
+  delay(266);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(214);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(240);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(230);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(219);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(500);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 294);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(250);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(185);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(229);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(230);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(229);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(201);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(258);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(221);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 440);
+  delay(229);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(250);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(302);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(380);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(423);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(250);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(250);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(263);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(517);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(500);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 220);
+  delay(500);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 220);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(375);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(375);
+  noTone(BUZZER_PIN);
+    // Add remaining tones for Song 1
+}
 
+void song2(int buzzerPin) {
+    // Song 2 notes
+tone(BUZZER_PIN, 208);
+  delay(77);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(58);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(79);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(52);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 349);
+  delay(285);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 349);
+  delay(277);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(439);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(74);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(52);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(82);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(52);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(312);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(280);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(299);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 262);
+  delay(77);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(217);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(66);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(55);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(77);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(49);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(419);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(112);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 262);
+  delay(334);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(60);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(414);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(121);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(236);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(195);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(482);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(69);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(58);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(82);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(52);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 349);
+  delay(439);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 349);
+  delay(178);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(491);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(69);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(49);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(85);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(25);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 415);
+  delay(455);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(88);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(376);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 262);
+  delay(66);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(214);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(66);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(41);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(96);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(41);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(452);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(93);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(112);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 262);
+  delay(359);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 233);
+  delay(58);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(425);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 208);
+  delay(110);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 311);
+  delay(447);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(576);
+  noTone(BUZZER_PIN);
+    // Add remaining tones for Song 2
+}
 
-// Function to play the selected song based on EEPROM stored value
-void playSelectedSong(int buzzerPin) {
-    int songChoice = EEPROM.read(5); // Assuming 5th position is used to store song choice
+void song3(int buzzerPin) {
+    // Song 3 notes
+tone(BUZZER_PIN, 330);
+  delay(602);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(365);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 294);
+  delay(434);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 220);
+  delay(255);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(203);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(203);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(226);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 294);
+  delay(781);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(185);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(226);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(243);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 330);
+  delay(249);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 370);
+  delay(336);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 294);
+  delay(625);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 294);
+  delay(203);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(237);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 294);
+  delay(220);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 277);
+  delay(214);
+  noTone(BUZZER_PIN);
+  tone(BUZZER_PIN, 247);
+  delay(1169);
+  noTone(BUZZER_PIN);
+    // Add remaining tones for Song 3
+}
+
+void playSelectedSong(int buzzerPin, int songChoice) {
     switch (songChoice) {
+        case 0:
+            song1(buzzerPin);
+            break;
         case 1:
-            songChristmas(buzzerPin);
+            song2(buzzerPin);
             break;
         case 2:
-            songGolf(buzzerPin);
-            break;
-        case 3:
-            songRickroll(buzzerPin);
-            break;
-        default:
-            songChristmas(buzzerPin); // Default to Christmas if invalid choice
+            song3(buzzerPin);
             break;
     }
 }
-
-void songChristmas(int buzzerPin) {
-  
-  Serial.println("Starting song function");
-  
-  tone(buzzerPin, 330);
-  delay(266);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(214);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(240);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(230);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(219);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(500);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 294);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(185);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(229);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(230);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(229);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(201);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(258);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(221);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(229);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(302);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(380);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(423);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(263);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(517);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(500);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 220);
-  delay(500);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 220);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(375);
-  noTone(buzzerPin);
-
-}
-
-
-void songGolf(int buzzerPin) {
-
-  tone(buzzerPin, 330);
-  delay(266);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(214);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(240);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(230);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(219);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(500);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 294);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(185);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(229);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(230);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(229);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(201);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(258);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(221);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 440);
-  delay(229);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 370);
-  delay(302);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(380);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(423);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 330);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(250);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(263);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(517);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(500);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 220);
-  delay(500);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 220);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(375);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 247);
-  delay(375);
-  noTone(buzzerPin);
-   
-}
-
-void songRickroll(int buzzerPin) {
-
- tone(buzzerPin, 208);
-  delay(77);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(58);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(79);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(52);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 349);
-  delay(285);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 349);
-  delay(277);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(439);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(74);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(52);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(82);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(52);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(312);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(280);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(299);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 262);
-  delay(77);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(217);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(66);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(55);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(77);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(49);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(419);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(112);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 262);
-  delay(334);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(60);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(414);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(121);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(236);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(195);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(482);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(69);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(58);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(82);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(52);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 349);
-  delay(439);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 349);
-  delay(178);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(491);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(69);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(49);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(85);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(25);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 415);
-  delay(455);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(88);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(376);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 262);
-  delay(66);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(214);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(66);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(41);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(96);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(41);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(452);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(93);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(112);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 262);
-  delay(359);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 233);
-  delay(58);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(425);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 208);
-  delay(110);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 311);
-  delay(447);
-  noTone(buzzerPin);
-
-  tone(buzzerPin, 277);
-  delay(576);
-  noTone(buzzerPin);
-    
-}
-
 
 void handleJsonObject(JsonObject obj, unsigned long currentMillis) {
     const char* trackTitle = obj["TrackTitle"];
@@ -666,7 +445,7 @@ void handleJsonObject(JsonObject obj, unsigned long currentMillis) {
     Serial.print("Received Track Title: ");
     Serial.println(currentSongTitle);
 
-  if (currentSongTitle == storedSongTitle) {
+    if (currentSongTitle == storedSongTitle) {
         Serial.println("Stored song is playing!! Setting blinkLED flag to true.");
         blinkLED = true;
         isBlinking = true; // Set isBlinking to true when starting LED blinking
@@ -674,18 +453,14 @@ void handleJsonObject(JsonObject obj, unsigned long currentMillis) {
         if (!songPlayed || (currentMillis - songPlayedTime >= ONE_HOUR)) {
             songPlayed = true;
             songPlayedTime = currentMillis;
-            playSelectedSong(14); // Play the selected song on pin 14
+            int songChoice = EEPROM.read(EEPROM_SIZE - 1);  // Read the stored buzzer sound choice
+            playSelectedSong(BUZZER_PIN, songChoice);  // Play the selected song
         }
-
-   
-       
-    } else {
-        Serial.println("Different song is playing. Keeping blinkLED flag false.");
-        blinkLED = false;
-        isBlinking = false; // Set isBlinking to false if not blinking
-        setLEDColor(parseTemperature(METAR).toFloat()); // Update LED color based on current METAR data
     }
 }
+
+
+
 
 
 String parseTemperature(const String& metar) {
@@ -722,7 +497,7 @@ void setLEDColor(float tempLed) {
     } else if (tempLed >= 6 && tempLed <= 10) {
         color = strip.Color(255, 255, 0); // Gul
     } else if (tempLed >= 11 && tempLed <= 20) {
-        color = strip.Color(100, 255, 0); // Orange 
+        color = strip.Color(153, 255, 0); // Orange 
     } else if (tempLed >= 21 && tempLed <= 60) {
         color = strip.Color(0, 255, 0); // Röd
     }
@@ -739,6 +514,7 @@ void handleRoot() {
     html += ".container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 20px; }";
     html += ".input-group { margin-bottom: 20px; }";
     html += ".input-group input[type='text'] { width: 80%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }";
+    html += ".input-group select { width: 80%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }";
     html += ".input-group input[type='submit'] { width: 18%; padding: 8px; font-size: 16px; border: none; background-color: #4caf50; color: #ffffff; cursor: pointer; border-radius: 5px; }";
     html += ".metar-info { font-size: 18px; margin-top: 20px; }";
     html += ".update-link { text-decoration: none; color: #4caf50; font-weight: bold; margin-top: 20px; display: block; }";
@@ -747,7 +523,12 @@ void handleRoot() {
     html += "<div class='input-group'><form method='post' action='/submit'>";
     html += "<input type='text' name='stationCode' placeholder='METAR Station Code' />";
     html += "<input type='text' name='songTitle' placeholder='Song Title' />";
-    html += "<select name='buzzerSound'><option value='1'>Last Christmas</option><option value='2'>SM i Bangolf 2012 i Kalmar</option><option value='3'>Never Gonna Give You Up</option></select>";
+    html += "<div class='input-group'><label for='buzzerSound'>Select Buzzer Sound:</label>";
+    html += "<select name='buzzerSound' id='buzzerSound'>";
+    html += "<option value='0'>SM i Bangolf 2012 i Kalmar</option>";
+    html += "<option value='1'>Never gonna give you up</option>";
+    html += "<option value='2'>Last Christmas</option>";
+    html += "</select></div>";
     html += "<input type='submit' value='Submit' />";
     html += "</form>";
     html += "<p>";
@@ -806,33 +587,36 @@ void handleRoot() {
 }
 
 
+
 void handleSubmit() {
-    if (server.method() == HTTP_POST) {
-        String stationCode = server.arg("stationCode");
-        String songTitle = server.arg("songTitle");
-        int buzzerSound = server.arg("buzzerSound").toInt();
+    String stationCode = server.arg("stationCode");
+    String songTitle = server.arg("songTitle");
+    int buzzerSound = server.arg("buzzerSound").toInt();
 
-        if (stationCode.length() == 4 && !songTitle.isEmpty()) {
-            // Save station code and song title to EEPROM
-            for (int i = 0; i < 4; i++) {
-                EEPROM.write(i, stationCode[i]);
-            }
-            EEPROM.write(4, '\0'); // Null terminator for the station code
-            for (int i = 0; i < songTitle.length() && i < EEPROM_SIZE - 5; i++) {
-                EEPROM.write(5 + i, songTitle[i]);
-            }
-            EEPROM.write(5 + songTitle.length(), '\0'); // Null terminator for the song title
-            EEPROM.write(EEPROM_SIZE - 1, buzzerSound); // Save selected buzzer sound
+    // Convert the input station code to uppercase
+    stationCode.toUpperCase();
 
-            EEPROM.commit();
+    // Copy the uppercase station code to METARStation variable
+    stationCode.toCharArray(METARStation, 5);
 
-            server.send(200, "text/plain", "Settings saved successfully! Rebooting...");
-            delay(1000);
-            ESP.restart();
-        } else {
-            server.send(400, "text/plain", "Invalid input! Please provide a 4-character station code and a song title.");
-        }
+    // Copy the song title to storedSongTitle variable
+    songTitle.toCharArray(storedSongTitle, EEPROM_SIZE - 6);
+
+    // Store the buzzer sound choice
+    EEPROM.begin(EEPROM_SIZE);
+    for (int i = 0; i < 5; ++i) {
+        EEPROM.write(i, METARStation[i]);
     }
+    for (int i = 0; i < EEPROM_SIZE - 6; ++i) {
+        EEPROM.write(i + 5, storedSongTitle[i]);
+    }
+    EEPROM.write(EEPROM_SIZE - 1, buzzerSound);
+    EEPROM.end();
+
+    // Fetch METAR data immediately after station code submission
+    fetchMETARData();
+
+    server.send(200, "text/html", "Settings updated. <a href='/'>Back</a>");
 }
 
 
@@ -883,51 +667,39 @@ void fetchMETARData() {
 
 
 void setup() {
-    Serial.begin(115200);
-
-    EEPROM.begin(EEPROM_SIZE);
-
-    // Load station code from EEPROM
-    for (int i = 0; i < 4; i++) {
-        METARStation[i] = EEPROM.read(i);
-    }
-    METARStation[4] = '\0';
-
-    // Load song title from EEPROM
-    for (int i = 0; i < EEPROM_SIZE - 5; i++) {
-        storedSongTitle[i] = EEPROM.read(5 + i);
-    }
-    storedSongTitle[EEPROM_SIZE - 5] = '\0';
-
-    // Load selected buzzer sound from EEPROM
-    int selectedBuzzerSound = EEPROM.read(EEPROM_SIZE - 1);
-
-    // WiFiManager
-    WiFiManager wifiManager;
-    wifiManager.autoConnect("AutoConnectAP");
-
-    // Set up LED strip
-    strip.begin();
-    strip.setBrightness(LED_BRIGHTNESS);
-    strip.show();
-
-    // Set up OLED display
-    display.begin(SSD1306_I2C_ADDRESS, OLED_RESET);
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.display();
     delay(2000);
     display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(0, 0);
-    display.println("System Ready");
-    display.display();
+    Serial.begin(115200);
+    MDNS.begin("whamageddonlamp");
+    ElegantOTA.begin(&server);
 
-    server.on("/", handleRoot);
-    server.on("/submit", HTTP_POST, handleSubmit);
-    ElegantOTA.begin(&server);    // Start ElegantOTA
-    server.begin();
+    // Initialize NeoPixel strip
+    strip.begin();
+    strip.show();  // Initialize all pixels to 'off'
 
+    // Use WiFiManager to set WiFi credentials if they are not already configured
+    WiFiManager wifiManager;
+    wifiManager.autoConnect("Whamageddonlamp");
+
+    // Load METAR station code and song title from EEPROM
+    EEPROM.begin(EEPROM_SIZE);
+    for (int i = 0; i < 5; ++i) {
+        METARStation[i] = EEPROM.read(i);
+    }
+    for (int i = 0; i < EEPROM_SIZE - 5; ++i) {
+        storedSongTitle[i] = EEPROM.read(i + 5);
+    }
+    EEPROM.end();
+
+    // Fetch METAR data as soon as possible after boot
     fetchMETARData();
+
+    // Start web server
+    server.on("/", HTTP_GET, handleRoot);
+    server.on("/submit", HTTP_POST, handleSubmit);
+    server.begin();
 }
 
 

@@ -1,10 +1,11 @@
 # Whamageddonlampan
 
-<b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på [SM i Bangolf 2012 i Kalmar](https://open.spotify.com/track/16TkRIy5gUXIdXDh36Aj95) När låten matchar på Mix Megapol så spelas en välkänd truddelutt av lampan.
 
 En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Det går även att bevaka andra låtar, du ställer själv in låt i webbinterfacet. Lampan spelar även några toner av Last Christmas med hjälp av en störig buzzer vid träff. 
 
 Kompilera filen whamageddonlamp.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
+
+<b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på [SM i Bangolf 2012 i Kalmar](https://open.spotify.com/track/16TkRIy5gUXIdXDh36Aj95) När låten matchar på Mix Megapol så spelas en välkänd truddelutt av lampan.
 
 Lampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
 

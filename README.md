@@ -1,41 +1,35 @@
-# Whamageddonlampan
+# Whamageddon lamp
 
 
-En 3D-printad lampa som ändrar färg beroende på yttertemperatur och som specialfeature blinkar när Last Christmas med Wham spelas på Mix Megapol. Det går även att bevaka andra låtar, du ställer själv in låt i webbinterfacet. Lampan spelar även några toner av Last Christmas med hjälp av en störig buzzer vid träff. 
+A 3D-printed lamp that changes color depending on the outside temperature and, as a special feature, blinks when Last Christmas by Wham is played on the radio station. You can also monitor other songs by setting the song in the web interface. The lamp also plays a few notes from Last Christmas using an annoying buzzer when the song is detected. The API supports many european radia stations, so just check the code and you can easily figure out how to change it to your local radio station. The default setting is for Mix Megapol in Sweden
 
-Kompilera filen whamageddonlamp.ino  i Arduino IDE eller så laddar du ner .bin-filen och flashar direkt med exempelvis NodeMCUflasher
+You can compile the file whamageddonlamp.ino in Arduino IDE or download the .bin file (with Mix Megapol) and flash it directly with, for example, NodeMCUflasher.
 
-<b>EDIT:</b> Nu även i <b>sommarversion.</b> Kompilera filen <b>bangolf.ino</b> om ni vill ha koll på [SM i Bangolf 2012 i Kalmar](https://open.spotify.com/track/16TkRIy5gUXIdXDh36Aj95) När låten matchar på Mix Megapol så spelas en välkänd truddelutt av lampan.
+The lamp consists of an addressable WS2812 LED that changes color based on the outside temperature. The data source can be any major airport in the world. Via a web interface, you input the METAR code of the airport. (The most common Swedish airports are listed on the HTML page.)
 
-Lampan består av en adresserbar WS2812 LED som ändrar färg beroende på yttertemperaturen. Datakällan är valfri större flygplats i världen. Via ett webbinterface matar man in den METAR-kod som flygplatsen har. (De vanligaste svenska flygplatserna finns listade på HTML-sidan)
+The temperature is also displayed on the OLED screen, and all weather data is presented in the web interface. The lamp checks the radio stations playlist every 30 seconds to notify you when Last Christmas is played. When detected, the lamp starts blinking. A buzzer also plays a few familiar notes, but the sound is only heard once per song play. The blinking continues until the song ends.
 
-Temperaturen visas även med siffror på OLED-skärmen och "allt" väder presenteras i webbinterfacet.
-Lampan kollar spellistan mot Mix Megapol var 30 sekund för att upplysa dig om när 'Last Christmas' spelas. Vid träff börjar lampan blinka. En buzzer krämar dessutom ur sig några välkända noter. Oljudet hörs dock bara en gång per spelning av låten. Blinkandet pågår tills låten är slut.  
+Here’s a video showing how it works (without the buzzer): https://youtu.be/staYxQRvpsY
 
-Här är en video som visar hur det funkar (utan buzzern) : https://youtu.be/staYxQRvpsY
+I printed the case in wood filament and stained it. The star is printed in white PLA in vase mode. Other lamp designs are availabe (tulip and "ball") The case is available in two versions, and STEP/STL files can be downloaded. Choose whether you want the version with or without mounts for M 2.5 screws. The version with screws is better, but if you don’t have any M 2.5 screws, the version without screws works if you secure the Wemos with hot glue.
 
-Jag har printat lådan i träfilament och betsat den. Stjärnan är printad i vit PLA i vase mode.
-Lådan finns att printa i två olika versioner och STEP/STL-filer finns att ladda ner.  Välj om du vill ha versionen med eller utan fästen för M 2.5 skruvar. Den med skruv är bättre, men har du inga M 2.5 liggandes så funkar versionen utan skruv om du säkrar Wemosen med smältlim. 
+The pole that the star sits on is a regular metal straw available at Amazon or a big supermarket. The components needed are:
 
-Själva stången som stjärnan sitter på är ett vanligt metallsugrör som finns på ICA eller amazon.se. 
-De komponenter som behövs är:
-
-- 3D-printad låda och lock
-- Wemos D1 mini v3 (varianten med skruvhål)  https://www.aliexpress.com/item/4000420770002.html
+- 3D-printed case and lid
+- Wemos D1 mini v3 (the version with screw holes) https://www.aliexpress.com/item/4000420770002.html
 - Wemos D1 mini OLED shield https://www.aliexpress.com/item/32804426981.html
 - WS2812 LED https://www.aliexpress.com/item/1005001863273661.html
-- WS2812 LED (alternativ i Sverige) https://www.electrokit.com/produkt/led-rgb-5mm-adresserbar-ws2812-diffus-5-pack/
-- 100 ohm motstånd
-- Passiv Buzzer https://www.aliexpress.com/item/1005006213298069.html
-- Metallsugrör https://www.amazon.se/Alfresco-metallsugr%C3%B6r-%C3%A5teranv%C3%A4ndbara-reng%C3%B6ringsborstar-cocktail/dp/B0BKT4334T/ref=sr_1_17
-- Dupontsladdar
-- Smältlim för att få LEDen på plats i stjärnan
-- Superlim 
-- Microusb-kabel
-- Krympslang (för lödningarna vid LEDen)
-- 2 st M 2.5 skruvar (Funkar även utan om du printar den versionen av lådan)
+- 100-ohm resistor
+- Passive buzzer https://www.aliexpress.com/item/1005006213298069.html
+- Metal straw https://www.amazon.se/Alfresco-metallsugr%C3%B6r-%C3%A5teranv%C3%A4ndbara-reng%C3%B6ringsborstar-cocktail/dp/B0BKT4334T/ref=sr_1_17
+- Dupont wires
+- Hot glue to secure the LED in the star
+- Super glue
+- Micro USB cable
+- Heat shrink tubing (for the soldering at the LED)
+- 2 M 2.5 screws (It also works without them if you print the version without screw mounts)
 
-<h1>Kopplingsschema</h1>
+<h1>Wiring diagram</h1>
 
 
 ![templampan](https://github.com/duelago/Temperaturlampan/assets/12539239/ebb60627-cd37-4e9d-8fff-efc2866f2104)
@@ -45,32 +39,32 @@ De komponenter som behövs är:
 
 
 
-<h1>3D-printad lampa</h1>
+<h1>3D-printed lamp</h1>
 
 ![whamageddonlampan](https://github.com/duelago/Temperaturlampan/assets/12539239/6cb68040-5377-46a6-b174-873620f04d1d)
 
 
-<h1>Julversion</h1>
+<h1>Christmas version</h1>
 
 ![temperaturlampan-stjarna](https://github.com/duelago/Temperaturlampan/assets/12539239/859001ad-1024-4838-bd3d-e470d4a57013)
 
 
-Denna versionen av Wemos D1 mini med skruvhål passar i lådan 
+This version of the Wemos D1 fits. V3 with holes for screws.
 
 ![Screenshot 2023-10-04 at 19 12 29](https://github.com/duelago/Temperaturlampan/assets/12539239/45842c62-73e3-4499-badd-159bfa92e052)
 
 
-<h1>Instruktioner</h1>
+<h1>Instructions</h1>
 
-Jag printar mina lådor och lock i PLA med 0.6 nozzle och 0.3 mm lagerhöjd. Själva stjärnan printar jag i vase mode med 0.4 nozzle och 0.2 mm lagerhöjd i vit PLA. Lådan går garanterat fint att printa med 0.4 nozzle även den, men det tar naturligtvis längre tid.
+I print my boxes and lids in PLA using a 0.6 nozzle and 0.3 mm layer height. I print the star itself in vase mode with a 0.4 nozzle and 0.2 mm layer height in white PLA. The box can definitely be printed with a 0.4 nozzle as well, but it will naturally take longer.
 
-I övrigt är det bara att titta på kopplingsschemat och löda kablarna på plats och vara uppmärksam på vilka ben på LEDen som ska kopplas var. Jag använder lite smältlim för att få LEDen på plats i själva stjärnan. Glöm inte krympslang för att separera de tre kontaktytorna till LEDen. I julversionen limmar jag ihop de två delarna av stjärnan med superlim och med "tulpanen" limmar jag den lilla adaptern med superlim.
+Other than that, just follow the wiring diagram and solder the wires in place, paying attention to which pins on the LED should be connected where. I use a bit of hot glue to secure the LED inside the star. Don't forget to use heat shrink tubing to separate the three contact points of the LED. In the Christmas version, I glue the two parts of the star together with super glue, and for the "tulip," I glue the small adapter with super glue as well.
 
-Användaren ansluter enheten med en vanlig microusb-kabel och mobilladdare. Första gången man ansluter lampan i hemmet dyker en ny accesspunkt upp som heter <b>Whamageddonlamp</b> Anslut till denna via den captive portal som poppar upp, eller via IP-adress: http://192.168.4.1
+The user connects the device with a standard micro USB cable and phone charger. The first time you connect the lamp at home, a new access point named Whamageddonlamp will appear. Connect to it via the captive portal that pops up, or through the IP address: http://192.168.4.1.
 
-Lampan får nu en IP-adress av DHCP-servern i hemmet. Användaren ansluter sin dator eller telefon till sitt hemmawifi igen och når nu lampan via denna nya IP-adress eller på adressen: http://whamageddonlamp.local Funkar inte det så använd appen Fing eller liknande på din telefon för att lista ut vilken IP-adress lampan har fått. 
+The lamp will then receive an IP address from the DHCP server at home. The user can reconnect their computer or phone to their home WiFi and access the lamp through this new IP address or via the address: http://whamageddonlamp.local. If that doesn't work, use the Fing app or a similar one on your phone to find out which IP address the lamp has been assigned.
 
-I webbinterfacet ställer man in flygplats och låt man vill bevaka. Dessa sparas i EEPROM och klarar alltså strömavbrott etc. 
+In the web interface, you can set the airport and the song you want to monitor. These are stored in EEPROM, so they are preserved even during power outages, etc.
 
 
 ![Screenshot 2024-05-22 at 08 39 23](https://github.com/duelago/Temperaturlampan/assets/12539239/358260d7-782f-43a1-8a2a-4314bc805bc0)

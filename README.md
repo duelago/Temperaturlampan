@@ -1,7 +1,7 @@
 # Whamageddon lamp
 
 
-A 3D-printed lamp that changes color depending on the outside temperature and, as a special feature, blinks when Last Christmas by Wham is played on the radio station. You can also monitor other songs by setting the song in the web interface. The lamp also plays a few notes from Last Christmas using an annoying buzzer when the song is detected. The API supports many european radia stations, so just check the code and you can easily figure out how to change it to your local radio station. The default setting is for Mix Megapol in Sweden
+A 3D-printed lamp that changes color depending on the outside temperature and, as a special feature, blinks when Last Christmas by Wham is played on the radio station. You can also monitor other songs by setting the song in the web interface. The lamp also plays a few notes from Last Christmas using an annoying buzzer when the song is detected. The API supports many european radio stations, so just check the code and you can easily figure out how to change it to your local radio station. The default setting is Mix Megapol in Sweden
 
 You can compile the file whamageddonlamp.ino in Arduino IDE or download the .bin file (with Mix Megapol) and flash it directly with, for example, NodeMCUflasher.
 

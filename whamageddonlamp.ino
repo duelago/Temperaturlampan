@@ -41,6 +41,7 @@ unsigned long songPlayedTime = 0;
 const unsigned long ONE_HOUR = 60 * 60 * 1000; // One hour in milliseconds
 
 const char* apiUrl = "https://listenapi.planetradio.co.uk/api9.2/nowplaying/mme";
+ //Some other stations can be found here https://listenapi.planetradio.co.uk/api9.2/stations_nowplaying
 
 bool blinkLED = false; // Flag to control LED blinking
 bool isBlinking = false; // Flag to track if LED is currently blinking

@@ -62,7 +62,7 @@ Other than that, just follow the wiring diagram and solder the wires in place, p
 
 The user connects the device with a standard micro USB cable and phone charger. The first time you connect the lamp at home, a new access point named Whamageddonlamp will appear. Connect to it via the captive portal that pops up, or through the IP address: http://192.168.4.1.
 
-The lamp will then receive an IP address from the DHCP server at home. The user can reconnect their computer or phone to their home WiFi and access the lamp through this new IP address or via the address: http://whamageddonlamp.local. If that doesn't work, use the Fing app or a similar one on your phone to find out which IP address the lamp has been assigned.
+Add the lamp in WifiManager to your local wifi network, with your private wifi password. The lamp will then receive an IP address from the DHCP server at home. The user can reconnect their computer or phone to their home WiFi and access the lamp through this new IP address or via the address: http://whamageddonlamp.local. If that doesn't work, use the Fing app or a similar one on your phone to find out which IP address the lamp has been assigned.
 
 In the web interface, you can set the airport and the song you want to monitor. These are stored in EEPROM, so they are preserved even during power outages, etc.
 

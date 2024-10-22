@@ -11,7 +11,7 @@ The temperature is also displayed on the OLED screen, and all weather data is pr
 
 Here’s a video showing how it works (without the buzzer): https://youtu.be/staYxQRvpsY
 
-I printed the case in wood filament and stained it. The star is printed in white PLA in vase mode. Other lamp designs are availabe (tulip and "ball") The case is available in two versions, and STEP/STL files can be downloaded. Choose whether you want the version with or without mounts for M 2.5 screws. The version with screws is better, but if you don’t have any M 2.5 screws, the version without screws works if you secure the Wemos with hot glue.
+I printed the case in wood filament and stained it. The star is printed in white PLA in vase mode. Other lamp designs are availabe (tulip, ball and "bambulab") The case is available in two versions, and STEP/STL files can be downloaded. Choose whether you want the version with or without mounts for M 2.5 screws. The version with screws is better, but if you don’t have any M 2.5 screws, the version without screws works if you secure the Wemos with hot glue.
 
 The pole that the star sits on is a regular metal straw available at Amazon or a big supermarket. The components needed are:
 

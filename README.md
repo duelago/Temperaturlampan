@@ -41,7 +41,7 @@ The pole that the star sits on is a regular metal straw available at Amazon or a
 
 
 
-<h1>Ball version/h1>
+<h1>Ball version</h1>
 
 ![whamageddonlampan](https://github.com/duelago/Temperaturlampan/assets/12539239/6cb68040-5377-46a6-b174-873620f04d1d)
 

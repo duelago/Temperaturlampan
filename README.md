@@ -35,11 +35,13 @@ The pole that the star sits on is a regular metal straw available at Amazon or a
 ![templampan](https://github.com/duelago/Temperaturlampan/assets/12539239/ebb60627-cd37-4e9d-8fff-efc2866f2104)
 
 
+<h1>"Bambu" version 3D-printed lamp</h1>
+
+![co2-lampan2](https://github.com/user-attachments/assets/887ccf7c-3a91-4f33-af3d-2c71e6b7bcfd)
 
 
 
-
-<h1>3D-printed lamp</h1>
+<h1>Ball version/h1>
 
 ![whamageddonlampan](https://github.com/duelago/Temperaturlampan/assets/12539239/6cb68040-5377-46a6-b174-873620f04d1d)
 

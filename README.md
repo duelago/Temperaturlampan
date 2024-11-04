@@ -56,7 +56,7 @@ This version of the Wemos D1 fits. V3 with holes for screws.
 ![Screenshot 2023-10-04 at 19 12 29](https://github.com/duelago/Temperaturlampan/assets/12539239/45842c62-73e3-4499-badd-159bfa92e052)
 
 
-New box for the electronics with the OLED-screen at an angle.
+New box for the electronics with the OLED-screen at an angle.<br>
 Download the templadan-oled-angle.stl for this version
 ![Screenshot 2024-11-04 at 16 55 20](https://github.com/user-attachments/assets/9803f675-ccf4-47ae-a14e-311152a19f75)
 

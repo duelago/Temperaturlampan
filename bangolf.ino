@@ -8,7 +8,7 @@
 #include <WiFiManager.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <Adafruit_SSD1306.h> //special version for Wemos D1 mini
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
 #include <ElegantOTA.h>
